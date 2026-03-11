@@ -8,7 +8,12 @@
       "Bash(env)",
       "Bash(lsof -ti:3000)",
       "Bash(xargs kill -9)",
-      "Bash(env -u ANTHROPIC_API_KEY npm run dev -- --hostname 0.0.0.0)"
+      "Bash(env -u ANTHROPIC_API_KEY npm run dev -- --hostname 0.0.0.0)",
+      "Bash(git commit --allow-empty -m \"trigger vercel deploy\")",
+      "Bash(git push)",
+      "Bash(npm install react react-dom --save)",
+      "Bash(git add -A)",
+      "Bash(git commit -m \"fix: remove old Vite files, add react deps for Vercel\")"
     ]
   }
 }
