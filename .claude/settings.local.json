@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xxd .env.local)",
+      "Bash(node -e \":*)",
+      "Bash(ls -la /Users/lalarukh/Downloads/Lala/verifai/.env*)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(env)",
+      "Bash(lsof -ti:3000)",
+      "Bash(xargs kill -9)",
+      "Bash(env -u ANTHROPIC_API_KEY npm run dev -- --hostname 0.0.0.0)"
+    ]
+  }
+}
