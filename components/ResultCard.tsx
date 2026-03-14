@@ -305,9 +305,12 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
             className="flex items-start gap-2.5 px-5 py-4 border-b"
             style={{ backgroundColor: "rgba(148,163,184,0.04)", borderColor: "#141420" }}
           >
-            <svg className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: "#94a3b8" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
+            {/* Icon wrapper sized to text-sm line-height so it aligns with the heading */}
+            <div className="flex-shrink-0 flex items-center" style={{ height: "1.25rem" }}>
+              <svg className="w-3.5 h-3.5" style={{ color: "#94a3b8" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </div>
             <div className="flex-1 min-w-0">
               <span className="font-mono text-sm font-semibold" style={{ color: "#94a3b8" }}>
                 {result.claims.length} Claim{result.claims.length !== 1 ? "s" : ""} Analysed
