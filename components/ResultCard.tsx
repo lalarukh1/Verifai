@@ -76,9 +76,10 @@ function formatFollowers(n: number): string {
 interface ResultCardProps {
   result: AnalysisResult;
   onReset: () => void;
+  onInfoClick?: () => void;
 }
 
-export default function ResultCard({ result, onReset }: ResultCardProps) {
+export default function ResultCard({ result, onReset, onInfoClick }: ResultCardProps) {
   const [thumbError, setThumbError] = useState(false);
   const cfg = verdictConfig[result.overallVerdict] ?? verdictConfig.UNVERIFIED;
   const ec  = result.extractedContent;
@@ -117,6 +118,30 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
 
   return (
     <div className="w-full space-y-4">
+
+      {/* ── Top nav row ───────────────────────────────────── */}
+      <div className="flex items-center justify-between">
+        <button
+          onClick={onReset}
+          className="flex items-center gap-1.5 font-mono text-xs px-3 py-1.5 rounded-full border transition-all duration-200 hover:text-[#a78bfa] hover:border-[#3b2f6e]"
+          style={{ backgroundColor: "#0a0a18", borderColor: "#1a1a30", color: "#64748b" }}
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="flex-shrink-0">
+            <path d="M8 2L4 6L8 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Back
+        </button>
+        {onInfoClick && (
+          <button
+            onClick={onInfoClick}
+            className="flex items-center gap-1.5 font-mono text-xs px-3 py-1.5 rounded-full border transition-all duration-200 hover:text-[#a78bfa] hover:border-[#3b2f6e]"
+            style={{ backgroundColor: "#0a0a18", borderColor: "#1a1a30", color: "#64748b" }}
+          >
+            <span>ⓘ</span>
+            How it works
+          </button>
+        )}
+      </div>
 
       {/* ── Post card (ExampleCard style) ─────────────────── */}
       <div
@@ -302,20 +327,20 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
         >
           {/* Header */}
           <div
-            className="flex items-start gap-2.5 px-5 py-4 border-b"
+            className="flex items-start justify-between gap-3 px-5 py-4 border-b"
             style={{ backgroundColor: "rgba(148,163,184,0.04)", borderColor: "#141420" }}
           >
-            {/* Icon wrapper sized to text-sm line-height so it aligns with the heading */}
-            <div className="flex-shrink-0 flex items-center" style={{ height: "1.25rem" }}>
-              <svg className="w-3.5 h-3.5" style={{ color: "#94a3b8" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-            </div>
             <div className="flex-1 min-w-0">
-              <span className="font-mono text-sm font-semibold" style={{ color: "#94a3b8" }}>
-                {result.claims.length} Claim{result.claims.length !== 1 ? "s" : ""} Analysed
-              </span>
-              <p className="font-mono text-xs mt-0.5" style={{ color: "#3a3a55" }}>
+              {/* Icon + heading on same row */}
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4 flex-shrink-0" style={{ color: "#94a3b8" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                <span className="font-mono text-sm font-semibold" style={{ color: "#94a3b8" }}>
+                  {result.claims.length} Claim{result.claims.length !== 1 ? "s" : ""} Analysed
+                </span>
+              </div>
+              <p className="font-mono text-xs mt-1" style={{ color: "#64748b" }}>
                 Each factual claim from the post, individually fact-checked by AI
               </p>
             </div>
@@ -356,20 +381,21 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
         >
           {/* Header */}
           <div
-            className="flex items-start gap-2.5 px-5 py-4 border-b"
+            className="px-5 py-4 border-b"
             style={{ backgroundColor: "rgba(34,211,238,0.04)", borderColor: "#131325" }}
           >
-            <svg className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: "#22d3ee" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-            </svg>
-            <div className="flex-1 min-w-0">
+            {/* Icon + heading on same row */}
+            <div className="flex items-center gap-2">
+              <svg className="w-4 h-4 flex-shrink-0" style={{ color: "#22d3ee" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
               <span className="font-mono text-sm font-semibold" style={{ color: "#67e8f9" }}>
                 Resources
               </span>
-              <p className="font-mono text-xs mt-0.5" style={{ color: "#2a6070" }}>
-                Read the articles the AI used to reach this verdict
-              </p>
             </div>
+            <p className="font-mono text-xs mt-1" style={{ color: "#2a6070" }}>
+              Read the articles the AI used to reach this verdict
+            </p>
           </div>
 
           {/* Grid — 3-column compact cards */}
@@ -387,14 +413,20 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
                   onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#1e4a55"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#0d0d1e"; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#161628"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#0c0c1a"; }}
                 >
-                  {/* Top row: index badge + arrow */}
-                  <div className="flex items-center justify-between mb-2">
+                  {/* Number + title on same row, arrow trailing */}
+                  <div className="flex items-center gap-2 flex-1 mb-2">
                     <span
                       className="font-mono text-xs w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
                       style={{ backgroundColor: "#0f2a33", color: "#22d3ee" }}
                     >
                       {idx + 1}
                     </span>
+                    <p
+                      className="font-mono text-xs leading-snug line-clamp-3 flex-1 transition-colors group-hover:text-[#67e8f9]"
+                      style={{ color: "#94a3b8" }}
+                    >
+                      {source.name}
+                    </p>
                     <svg
                       width="10" height="10" viewBox="0 0 10 10" fill="none"
                       className="flex-shrink-0 transition-opacity opacity-0 group-hover:opacity-100"
@@ -404,16 +436,8 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
                     </svg>
                   </div>
 
-                  {/* Source name */}
-                  <p
-                    className="font-mono text-xs leading-snug line-clamp-2 flex-1 transition-colors group-hover:text-[#67e8f9]"
-                    style={{ color: "#94a3b8" }}
-                  >
-                    {source.name}
-                  </p>
-
                   {/* Domain + date */}
-                  <div className="mt-2 space-y-0.5">
+                  <div className="space-y-0.5">
                     {domain && (
                       <p className="font-mono text-xs truncate" style={{ color: "#2a6070" }}>
                         {domain}
@@ -432,20 +456,6 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
         </div>
       )}
 
-      {/* ── Reset ─────────────────────────────────────────── */}
-      <button
-        onClick={onReset}
-        className="w-full py-4 rounded-[14px] font-mono text-sm font-medium border transition-all duration-200 flex items-center justify-center gap-2 hover:text-[#a78bfa]"
-        style={{ backgroundColor: "#0a0a18", borderColor: "#1a1a30", color: "#64748b" }}
-        onMouseEnter={e => (e.currentTarget.style.borderColor = "#3b2f6e")}
-        onMouseLeave={e => (e.currentTarget.style.borderColor = "#1a1a30")}
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="flex-shrink-0">
-          <path d="M1 7A6 6 0 0 1 12.5 4M12.5 4V1M12.5 4H9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M13 7A6 6 0 0 1 1.5 10M1.5 10V13M1.5 10H4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-        Check another post
-      </button>
 
     </div>
   );

@@ -105,7 +105,7 @@ export default function Home() {
         {stage === "loading" && <LoadingState />}
 
         {stage === "result" && result && (
-          <ResultCard result={result} onReset={handleReset} />
+          <ResultCard result={result} onReset={handleReset} onInfoClick={() => setShowInfo(true)} />
         )}
       </div>
 
