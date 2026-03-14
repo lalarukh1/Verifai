@@ -78,7 +78,7 @@ export default function Home() {
               fontFamily: "var(--font-lora), serif",
             }}
           >
-            Works best with news and educational videos.
+            Works best with news and educational content on Instagram and TikTok.
           </p>
           {/* Info button */}
           <button

@@ -6,7 +6,6 @@ import { Platform } from "@/lib/types";
 function detectPlatformFromUrl(url: string): Platform {
   if (/instagram\.com/.test(url)) return "instagram";
   if (/tiktok\.com|vm\.tiktok\.com/.test(url)) return "tiktok";
-  if (/youtube\.com|youtu\.be/.test(url)) return "youtube";
   return "unknown";
 }
 
@@ -26,18 +25,9 @@ function TikTokIcon() {
   );
 }
 
-function YouTubeIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
-      <path d="M23.495 6.205a3.007 3.007 0 00-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 00.527 6.205a31.247 31.247 0 00-.522 5.805 31.247 31.247 0 00.522 5.783 3.007 3.007 0 002.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 002.088-2.088 31.247 31.247 0 00.5-5.783 31.247 31.247 0 00-.5-5.805zM9.609 15.601V8.408l6.264 3.602z" />
-    </svg>
-  );
-}
-
 function PlatformIcon({ platform }: { platform: Platform }) {
   if (platform === "instagram") return <InstagramIcon />;
   if (platform === "tiktok") return <TikTokIcon />;
-  if (platform === "youtube") return <YouTubeIcon />;
   return null;
 }
 
@@ -50,7 +40,6 @@ interface UrlInputProps {
 const platformColors: Record<Platform, string> = {
   instagram: "text-pink-400",
   tiktok: "text-cyan-400",
-  youtube: "text-red-400",
   unknown: "text-slate-500",
 };
 
@@ -74,7 +63,7 @@ export default function UrlInput({ onSubmit, isLoading, error }: UrlInputProps) 
     const p = detectPlatformFromUrl(url.trim());
     if (p === "unknown") {
       setValidationError(
-        "Please enter an Instagram, TikTok, or YouTube URL."
+        "Please enter an Instagram or TikTok URL."
       );
       return;
     }
@@ -99,7 +88,7 @@ export default function UrlInput({ onSubmit, isLoading, error }: UrlInputProps) 
             type="text"
             value={url}
             onChange={(e) => handleChange(e.target.value)}
-            placeholder="Paste an Instagram, TikTok or YouTube URL..."
+            placeholder="Paste an Instagram or TikTok URL..."
             disabled={isLoading}
             className={`
               w-full bg-[#0e0e1c] border border-[#1a1a30] rounded-[12px]

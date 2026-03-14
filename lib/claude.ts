@@ -1,10 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { Claim, ExtractedContent, OverallVerdict } from "./types";
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
-
 const SYSTEM_PROMPT = `You are VerifAI, a fact-checker with a conscience. You have the rigour of an investigative journalist and the heart of someone who deeply cares about humanity, truth, and the dignity of every human being.
 
 You must respond with ONLY valid JSON. No markdown, no explanation outside the JSON, no code fences.
@@ -81,6 +77,7 @@ Rules for claims:
 - Extract between 0 and 5 claims. If the post is purely emotional or a call for humanity with no specific factual assertions, return an empty claims array.
 - Always return "sources": [] for every claim. Sources are fetched separately from a live news index. Do not generate any URLs yourself.`;
 
+  const client = new Anthropic();
   console.log("🔄 [Claude] Sending to claude-sonnet-4-6 for analysis...");
   try {
     const message = await client.messages.create({

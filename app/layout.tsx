@@ -19,7 +19,7 @@ const lora = Lora({
 export const metadata: Metadata = {
   title: "VerifAI: Fact check social media instantly",
   description:
-    "Paste any Instagram, TikTok or YouTube URL and get an instant AI-powered fact-check report.",
+    "Paste any Instagram or TikTok URL and get an instant AI-powered fact-check report.",
 };
 
 export default function RootLayout({

@@ -38,7 +38,6 @@ const verdictConfig: Record<
 const platformIcon: Record<string, string> = {
   instagram: "IG",
   tiktok: "TT",
-  youtube: "YT",
 };
 
 const sourceLabel: Record<string, string> = {

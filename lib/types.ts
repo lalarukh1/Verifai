@@ -1,4 +1,4 @@
-export type Platform = "instagram" | "tiktok" | "youtube" | "unknown";
+export type Platform = "instagram" | "tiktok" | "unknown";
 
 export type ExtractionSource = "caption" | "audio" | "web" | "manual";
 

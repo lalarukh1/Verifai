@@ -19,7 +19,7 @@ const sections: Section[] = [
   {
     icon: "📥",
     title: "Content extraction",
-    body: "VerifAI uses Apify to extract captions and metadata from Instagram, TikTok, and YouTube posts. For video posts, Deepgram transcribes the audio so that claims spoken in the video, not just the caption, are also checked.",
+    body: "VerifAI uses Apify to extract captions and metadata from Instagram and TikTok posts. For video posts, Deepgram transcribes the audio so that claims spoken in the video, not just the caption, are also checked.",
   },
   {
     icon: "🔍",
@@ -34,7 +34,7 @@ const sections: Section[] = [
   {
     icon: "⚠️",
     title: "Limitations",
-    body: "VerifAI can only check public posts on Instagram, TikTok, and YouTube. It cannot access private accounts. Sources are drawn from what is publicly indexed at the time of the check. Very recent events may have limited coverage. Always read the linked sources yourself before drawing conclusions.",
+    body: "VerifAI can only check public posts on Instagram and TikTok. It cannot access private accounts. Sources are drawn from what is publicly indexed at the time of the check. Very recent events may have limited coverage. Always read the linked sources yourself before drawing conclusions.",
   },
 ];
 

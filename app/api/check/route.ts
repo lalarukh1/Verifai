@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: "Only Instagram, TikTok, and YouTube URLs are supported.",
+        error: "Only Instagram and TikTok URLs are supported.",
       },
       { status: 400 }
     );

@@ -3,7 +3,6 @@ import { ExtractedContent, Platform } from "./types";
 export function detectPlatform(url: string): Platform {
   if (/instagram\.com/.test(url)) return "instagram";
   if (/tiktok\.com|vm\.tiktok\.com/.test(url)) return "tiktok";
-  if (/youtube\.com|youtu\.be/.test(url)) return "youtube";
   return "unknown";
 }
 
@@ -35,20 +34,11 @@ interface ApifyTikTokPost {
   createTime?: number; // Unix timestamp in seconds
 }
 
-interface ApifyYouTubeVideo {
-  description?: string;
-  channelName?: string;
-  subscriberCount?: number;
-  videoUrl?: string;
-  thumbnailUrl?: string;
-  bestThumbnail?: { url?: string };
-  uploadDate?: string; // ISO date string
-  date?: string;
-}
 
 async function runApifyActor<T>(
   actorId: string,
-  input: Record<string, unknown>
+  input: Record<string, unknown>,
+  timeoutMs = 30000
 ): Promise<T[] | null> {
   const token = process.env.APIFY_API_KEY;
   if (!token) {
@@ -61,7 +51,7 @@ async function runApifyActor<T>(
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     const response = await fetch(url, {
       method: "POST",
@@ -73,8 +63,9 @@ async function runApifyActor<T>(
     clearTimeout(timeoutId);
 
     if (!response.ok) {
+      const errBody = await response.text().catch(() => "(unreadable)");
       console.error(
-        `Apify actor ${actorId} returned status ${response.status}`
+        `❌ [Apify] ${actorId} returned status ${response.status}: ${errBody}`
       );
       return null;
     }
@@ -171,38 +162,6 @@ export async function extractFromUrl(url: string): Promise<{
           postTimestamp: tiktokTimestamp,
         },
         videoUrl,
-      };
-    }
-
-    if (platform === "youtube") {
-      const results = await runApifyActor<ApifyYouTubeVideo>(
-        "bernardo_orellana/youtube-scraper",
-        {
-          startUrls: [{ url }],
-          maxResults: 1,
-        }
-      );
-
-      if (!results || results.length === 0) return { content: null };
-
-      const video = results[0];
-      const description = video.description ?? "";
-      const handle = video.channelName ?? "unknown";
-      const followers = video.subscriberCount;
-
-      return {
-        content: {
-          text: description,
-          source: description.length > 20 ? "caption" : "audio",
-          platform,
-          accountHandle: handle,
-          accountFollowers: followers,
-          postUrl: url,
-          rawCaption: description,
-          thumbnailUrl: video.bestThumbnail?.url ?? video.thumbnailUrl ?? undefined,
-          postTimestamp: video.uploadDate ?? video.date ?? undefined,
-        },
-        videoUrl: video.videoUrl ?? undefined,
       };
     }
 

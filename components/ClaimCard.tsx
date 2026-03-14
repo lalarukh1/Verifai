@@ -66,14 +66,14 @@ export default function ClaimCard({ claim }: ClaimCardProps) {
   const [expanded, setExpanded] = useState(false);
   const cfg = verdictConfig[claim.verdict] ?? verdictConfig.NO_EVIDENCE;
 
-  const domains = [
-    ...new Set(
+  const domains = Array.from(
+    new Set(
       (claim.sources ?? [])
         .filter((s) => isValidUrl(s.url))
         .map((s) => getDomain(s.url))
         .filter(Boolean)
-    ),
-  ].slice(0, 3);
+    )
+  ).slice(0, 3);
 
   return (
     <div
