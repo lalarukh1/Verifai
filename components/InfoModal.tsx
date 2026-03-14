@@ -31,11 +31,6 @@ const sections: Section[] = [
     title: "How the credibility score works",
     body: "The score starts at 50 (neutral). It goes up by 20 if the account has over 100,000 followers, and up by 10 if the claims have verifiable sources. It goes down by 20 if the overall verdict is False or Misleading. The final number sits between 0 and 100.",
   },
-  {
-    icon: "⚠️",
-    title: "Limitations",
-    body: "VerifAI can only check public posts on Instagram and TikTok. It cannot access private accounts. Sources are drawn from what is publicly indexed at the time of the check. Very recent events may have limited coverage. Always read the linked sources yourself before drawing conclusions.",
-  },
 ];
 
 export default function InfoModal({ onClose }: InfoModalProps) {
@@ -47,32 +42,32 @@ export default function InfoModal({ onClose }: InfoModalProps) {
       {/* Backdrop */}
       <div
         className="absolute inset-0"
-        style={{ backgroundColor: "rgba(7, 7, 17, 0.85)", backdropFilter: "blur(4px)" }}
+        style={{ backgroundColor: "rgba(7, 7, 17, 0.9)", backdropFilter: "blur(6px)" }}
       />
 
       {/* Sheet */}
       <div
-        className="relative w-full sm:max-w-[560px] rounded-t-[20px] sm:rounded-[20px] overflow-hidden"
-        style={{ backgroundColor: "#0e0e1c", border: "1px solid #1a1a30", maxHeight: "90vh" }}
+        className="relative w-full sm:max-w-[600px] rounded-t-[24px] sm:rounded-[24px] overflow-hidden"
+        style={{ backgroundColor: "#0e0e1c", border: "1px solid #252540", maxHeight: "92vh" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div
-          className="flex items-center justify-between px-6 py-5 border-b"
+          className="flex items-center justify-between px-7 py-6 border-b"
           style={{ borderColor: "#1a1a30" }}
         >
           <div>
-            <h2 className="text-base font-mono font-semibold" style={{ color: "#e2e8f0" }}>
+            <h2 className="text-xl font-mono font-bold" style={{ color: "#e2e8f0" }}>
               How VerifAI works
             </h2>
-            <p className="text-xs font-mono mt-0.5" style={{ color: "#64748b" }}>
-              What it uses, how it decides, where sources come from
+            <p className="text-sm mt-1" style={{ color: "#64748b", fontFamily: "var(--font-lora), serif" }}>
+              The AI, the sources, the score — explained.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full transition-colors hover:bg-[#1a1a30]"
-            style={{ color: "#64748b" }}
+            className="w-9 h-9 flex items-center justify-center rounded-full border transition-all duration-200 hover:border-[#3b2f6e] hover:text-[#a78bfa]"
+            style={{ borderColor: "#1a1a30", color: "#64748b" }}
             aria-label="Close"
           >
             ✕
@@ -80,12 +75,19 @@ export default function InfoModal({ onClose }: InfoModalProps) {
         </div>
 
         {/* Scrollable body */}
-        <div className="overflow-y-auto px-6 py-5 space-y-5" style={{ maxHeight: "calc(90vh - 80px)" }}>
+        <div className="overflow-y-auto px-7 py-6 space-y-7" style={{ maxHeight: "calc(92vh - 90px)" }}>
           {sections.map((s) => (
-            <div key={s.title} className="flex gap-4">
-              <span className="text-xl mt-0.5 shrink-0">{s.icon}</span>
-              <div>
-                <p className="text-sm font-mono font-semibold mb-1.5" style={{ color: "#e2e8f0" }}>
+            <div key={s.title} className="flex gap-5">
+              {/* Icon bubble */}
+              <div
+                className="w-11 h-11 rounded-[12px] flex items-center justify-center text-xl shrink-0"
+                style={{ backgroundColor: "#13132a", border: "1px solid #1a1a30" }}
+              >
+                {s.icon}
+              </div>
+
+              <div className="pt-0.5">
+                <p className="text-base font-mono font-semibold mb-2" style={{ color: "#e2e8f0" }}>
                   {s.title}
                 </p>
                 <p
@@ -100,10 +102,10 @@ export default function InfoModal({ onClose }: InfoModalProps) {
 
           {/* Footer note */}
           <div
-            className="mt-2 px-4 py-3 rounded-[10px] border"
-            style={{ backgroundColor: "#0a0a18", borderColor: "#1a1a30" }}
+            className="px-5 py-4 rounded-[12px] border"
+            style={{ backgroundColor: "#080815", borderColor: "#1a1a30" }}
           >
-            <p className="text-xs font-mono text-center" style={{ color: "#475569" }}>
+            <p className="text-sm font-mono text-center" style={{ color: "#475569" }}>
               VerifAI does not store your searches or share your data with third parties.
             </p>
           </div>

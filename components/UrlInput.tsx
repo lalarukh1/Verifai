@@ -221,8 +221,8 @@ export default function UrlInput({
           {/* Section divider */}
           <div className="flex items-center gap-4 mb-5">
             <div className="flex-1 h-px" style={{ backgroundColor: "#1a1a30" }} />
-            <p className="text-xs font-mono whitespace-nowrap" style={{ color: "#475569" }}>
-              or see it in action
+            <p className="text-sm font-mono whitespace-nowrap" style={{ color: "#475569" }}>
+              Not sure what to paste? try one of these
             </p>
             <div className="flex-1 h-px" style={{ backgroundColor: "#1a1a30" }} />
           </div>

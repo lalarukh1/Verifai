@@ -24,7 +24,16 @@ export default function LoadingState() {
     if (elapsed >= 20 && currentStage < 2) setCurrentStage(2);
   }, [elapsed, currentStage]);
 
-  const displayTime = elapsed < 15 ? `${elapsed}s elapsed` : "Almost there...";
+  const timerMessages = [
+    { until: 5,  text: "Reading the post…"               },
+    { until: 10, text: "Identifying factual claims…"      },
+    { until: 16, text: "Consulting trusted sources…"      },
+    { until: 22, text: "Weighing the evidence…"           },
+    { until: 30, text: "Double-checking a few sources…"   },
+    { until: 40, text: "This one has a lot to unpack…"    },
+    { until: Infinity, text: "Still on it, almost there…" },
+  ];
+  const displayTime = timerMessages.find((m) => elapsed < m.until)!.text;
 
   return (
     <div className="w-full flex flex-col items-center gap-6 py-8">

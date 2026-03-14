@@ -87,7 +87,7 @@ export default function Home() {
               fontFamily: "var(--font-lora), serif",
             }}
           >
-            Works best with news and educational content on Instagram and TikTok.
+            Verify news and information in Instagram Reels and TikToks before you share.
           </p>
         </div>
 
