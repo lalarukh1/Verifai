@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Platform } from "@/lib/types";
+import { EXAMPLES } from "@/lib/examples";
 
 function detectPlatformFromUrl(url: string): Platform {
   if (/instagram\.com/.test(url)) return "instagram";
@@ -35,6 +36,7 @@ interface UrlInputProps {
   onSubmit: (url: string) => void;
   isLoading: boolean;
   error?: string | null;
+  onExample?: (index: number) => void;
 }
 
 const platformColors: Record<Platform, string> = {
@@ -43,7 +45,7 @@ const platformColors: Record<Platform, string> = {
   unknown: "text-slate-500",
 };
 
-export default function UrlInput({ onSubmit, isLoading, error }: UrlInputProps) {
+export default function UrlInput({ onSubmit, isLoading, error, onExample }: UrlInputProps) {
   const [url, setUrl] = useState("");
   const [platform, setPlatform] = useState<Platform>("unknown");
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -121,6 +123,33 @@ export default function UrlInput({ onSubmit, isLoading, error }: UrlInputProps) 
       >
         {isLoading ? "Analysing..." : "Fact Check"}
       </button>
+
+      {/* Example chips */}
+      {onExample && (
+        <div className="mt-5">
+          <p className="text-xs font-mono text-center mb-2.5" style={{ color: "#3a3a55" }}>
+            or try an example
+          </p>
+          <div className="flex gap-2">
+            {EXAMPLES.map((ex, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => onExample(i)}
+                className="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-[10px] border transition-all duration-200 hover:border-[#3b2f6e] hover:bg-[#0e0e1c] text-left"
+                style={{ borderColor: "#1a1a30", backgroundColor: "#0a0a18" }}
+              >
+                <span className={ex.platform === "instagram" ? "text-pink-400" : "text-cyan-400"} style={{ flexShrink: 0 }}>
+                  {ex.platform === "instagram" ? <InstagramIcon /> : <TikTokIcon />}
+                </span>
+                <span className="text-xs font-mono truncate" style={{ color: "#64748b" }}>
+                  {ex.label}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </form>
   );
 }

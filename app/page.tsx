@@ -6,6 +6,7 @@ import LoadingState from "@/components/LoadingState";
 import ResultCard from "@/components/ResultCard";
 import InfoModal from "@/components/InfoModal";
 import { AnalysisResult, CheckResponse } from "@/lib/types";
+import { EXAMPLES } from "@/lib/examples";
 
 type Stage = "input" | "loading" | "result";
 
@@ -46,6 +47,14 @@ export default function Home() {
     setResult(null);
     setError(null);
     setStage("input");
+  }
+
+  function handleExample(index: number) {
+    const ex = EXAMPLES[index];
+    if (!ex) return;
+    setError(null);
+    setResult(ex.result);
+    setStage("result");
   }
 
   return (
@@ -97,6 +106,7 @@ export default function Home() {
             onSubmit={handleSubmit}
             isLoading={false}
             error={error}
+            onExample={handleExample}
           />
         )}
 
