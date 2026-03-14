@@ -348,18 +348,20 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
         >
           {/* Header */}
           <div
-            className="flex items-center gap-2.5 px-5 py-3.5 border-b"
+            className="flex items-start gap-2.5 px-5 py-4 border-b"
             style={{ backgroundColor: "rgba(34,211,238,0.04)", borderColor: "#131325" }}
           >
-            <svg className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#22d3ee" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: "#22d3ee" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
             </svg>
-            <span className="font-mono text-sm font-semibold" style={{ color: "#67e8f9" }}>
-              Sources checked
-            </span>
-            <span className="font-mono text-xs ml-auto" style={{ color: "#164e63" }}>
-              {uniqueSources.length} source{uniqueSources.length !== 1 ? "s" : ""}
-            </span>
+            <div className="flex-1 min-w-0">
+              <span className="font-mono text-sm font-semibold" style={{ color: "#67e8f9" }}>
+                Read it yourself
+              </span>
+              <p className="font-mono text-xs mt-0.5" style={{ color: "#2a6070" }}>
+                {uniqueSources.length} source{uniqueSources.length !== 1 ? "s" : ""} used to fact-check this post — open any to verify
+              </p>
+            </div>
           </div>
 
           {/* List */}
