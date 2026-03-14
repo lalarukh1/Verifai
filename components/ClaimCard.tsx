@@ -142,7 +142,7 @@ export default function ClaimCard({ claim }: ClaimCardProps) {
           {claim.sources && claim.sources.some(s => isValidUrl(s.url)) && (
             <div>
               <p className="text-xs font-mono font-semibold uppercase tracking-widest mb-2" style={{ color: "#475569" }}>
-                Read it yourself
+                Resources
               </p>
               <div className="space-y-2">
                 {claim.sources

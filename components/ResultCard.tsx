@@ -356,10 +356,10 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
             </svg>
             <div className="flex-1 min-w-0">
               <span className="font-mono text-sm font-semibold" style={{ color: "#67e8f9" }}>
-                Read it yourself
+                Resources
               </span>
               <p className="font-mono text-xs mt-0.5" style={{ color: "#2a6070" }}>
-                {uniqueSources.length} source{uniqueSources.length !== 1 ? "s" : ""} used to fact-check this post, open any to verify
+                Read the articles the AI used to reach this verdict
               </p>
             </div>
           </div>
