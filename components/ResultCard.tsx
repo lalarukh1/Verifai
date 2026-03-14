@@ -372,8 +372,8 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
             </div>
           </div>
 
-          {/* List */}
-          <div className="p-3 flex flex-col gap-2">
+          {/* Grid — 3-column compact cards */}
+          <div className="p-3 grid grid-cols-3 gap-2">
             {uniqueSources.map((source, idx) => {
               const domain = (() => { try { return new URL(source.url).hostname.replace(/^www\./, ""); } catch { return ""; } })();
               return (
@@ -382,51 +382,49 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
                   href={source.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 rounded-[12px] px-4 py-3 border transition-all duration-200 group"
-                  style={{ backgroundColor: "#0c0c1a", borderColor: "#161628" }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#1e4a55"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#161628"; }}
+                  className="flex flex-col rounded-[12px] p-3 border transition-all duration-200 group"
+                  style={{ backgroundColor: "#0c0c1a", borderColor: "#161628", minHeight: "90px" }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#1e4a55"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#0d0d1e"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#161628"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#0c0c1a"; }}
                 >
-                  {/* Index number */}
-                  <span
-                    className="font-mono text-xs w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: "#0f2a33", color: "#22d3ee" }}
-                  >
-                    {idx + 1}
-                  </span>
-
-                  {/* Name + domain */}
-                  <div className="flex-1 min-w-0">
-                    <p
-                      className="text-sm font-mono truncate transition-colors group-hover:text-[#67e8f9]"
-                      style={{ color: "#cbd5e1" }}
+                  {/* Top row: index badge + arrow */}
+                  <div className="flex items-center justify-between mb-2">
+                    <span
+                      className="font-mono text-xs w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: "#0f2a33", color: "#22d3ee" }}
                     >
-                      {source.name}
-                    </p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      {domain && (
-                        <span className="font-mono text-xs" style={{ color: "#2a4a55" }}>
-                          {domain}
-                        </span>
-                      )}
-                      {source.date && (
-                        <span className="font-mono text-xs" style={{ color: "#2a4a55" }}>
-                          · {source.date}
-                        </span>
-                      )}
-                    </div>
+                      {idx + 1}
+                    </span>
+                    <svg
+                      width="10" height="10" viewBox="0 0 10 10" fill="none"
+                      className="flex-shrink-0 transition-opacity opacity-0 group-hover:opacity-100"
+                      style={{ color: "#22d3ee" }}
+                    >
+                      <path d="M1.5 8.5L8.5 1.5M8.5 1.5H3.5M8.5 1.5V6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
                   </div>
 
-                  {/* Arrow */}
-                  <svg
-                    width="12" height="12" viewBox="0 0 10 10" fill="none"
-                    className="flex-shrink-0 transition-colors"
-                    style={{ color: "#1e3a4a" }}
-                    onMouseEnter={e => (e.currentTarget.style.color = "#22d3ee")}
-                    onMouseLeave={e => (e.currentTarget.style.color = "#1e3a4a")}
+                  {/* Source name */}
+                  <p
+                    className="font-mono text-xs leading-snug line-clamp-2 flex-1 transition-colors group-hover:text-[#67e8f9]"
+                    style={{ color: "#94a3b8" }}
                   >
-                    <path d="M1.5 8.5L8.5 1.5M8.5 1.5H3.5M8.5 1.5V6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                    {source.name}
+                  </p>
+
+                  {/* Domain + date */}
+                  <div className="mt-2 space-y-0.5">
+                    {domain && (
+                      <p className="font-mono text-xs truncate" style={{ color: "#2a6070" }}>
+                        {domain}
+                      </p>
+                    )}
+                    {source.date && (
+                      <p className="font-mono text-xs" style={{ color: "#1e3a45" }}>
+                        {source.date}
+                      </p>
+                    )}
+                  </div>
                 </a>
               );
             })}
