@@ -48,6 +48,16 @@ const sourceLabel: Record<string, string> = {
   manual: "Manual input",
 };
 
+/** Returns true only for safe absolute http/https URLs */
+function isValidUrl(url: string): boolean {
+  try {
+    const { protocol } = new URL(url);
+    return protocol === "https:" || protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
 /** Strip em dashes and en dashes from AI-generated text */
 function clean(text: string): string {
   return text.replace(/\u2014/g, ",").replace(/\u2013/g, "-").trim();
@@ -94,6 +104,35 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
 
   const showThumb = !!ec.thumbnailUrl && !thumbError;
   const timestamp = ec.postTimestamp ? formatTimestamp(ec.postTimestamp) : null;
+
+  // Score breakdown factors
+  const hasLargeAccount = (ec.accountFollowers ?? 0) > 100_000;
+  const hasSources = result.claims.some(
+    (c) => c.sources?.some((s) => isValidUrl(s.url))
+  );
+  const hasNegativeVerdict =
+    result.overallVerdict === "FALSE" || result.overallVerdict === "MISLEADING";
+
+  const scoreFactors = [
+    { label: "Large account", delta: "+20", active: hasLargeAccount, positive: true },
+    { label: "Sources found", delta: "+10", active: hasSources, positive: true },
+    {
+      label: `${result.overallVerdict === "FALSE" ? "False" : "Misleading"} verdict`,
+      delta: "−20",
+      active: hasNegativeVerdict,
+      positive: false,
+    },
+  ];
+
+  // Aggregate unique sources across all claims
+  const seenUrls = new Set<string>();
+  const uniqueSources = result.claims
+    .flatMap((c) => c.sources ?? [])
+    .filter((s) => {
+      if (!isValidUrl(s.url) || seenUrls.has(s.url)) return false;
+      seenUrls.add(s.url);
+      return true;
+    });
 
   return (
     <div className="w-full space-y-4">
@@ -206,20 +245,37 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
 
       {/* ── Credibility Score ─────────────────────────────── */}
       <div className="rounded-[12px] bg-[#0e0e1c] border border-[#1a1a30] p-6">
-        <div className="flex items-center justify-center">
-          <div className="flex flex-col items-center gap-1">
-            <ScoreRing
-              value={result.credibilityScore}
-              label="Credibility"
-              color="#a78bfa"
-            />
-            <p className="text-[#64748b] font-mono text-xs text-center mt-1">
-              {result.credibilityScore >= 70
-                ? "High credibility"
-                : result.credibilityScore >= 40
-                ? "Moderate credibility"
-                : "Low credibility"}
-            </p>
+        <div className="flex flex-col items-center gap-4">
+          <ScoreRing
+            value={result.credibilityScore}
+            label="Credibility"
+            color="#a78bfa"
+          />
+          <div className="w-full space-y-2">
+            {scoreFactors.map((f) => (
+              <div key={f.label} className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="font-mono text-xs w-3 text-center"
+                    style={{ color: f.active ? (f.positive ? "#34d399" : "#f97316") : "#3a3a55" }}
+                  >
+                    {f.active ? (f.positive ? "✓" : "✗") : "–"}
+                  </span>
+                  <span
+                    className="font-mono text-xs"
+                    style={{ color: f.active ? "#94a3b8" : "#3a3a55" }}
+                  >
+                    {f.label}
+                  </span>
+                </div>
+                <span
+                  className="font-mono text-xs font-medium"
+                  style={{ color: f.active ? (f.positive ? "#34d399" : "#f97316") : "#3a3a55" }}
+                >
+                  {f.active ? f.delta : "—"}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -236,10 +292,57 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
           ))}
         </div>
       ) : (
-        <div className="rounded-[12px] bg-[#0e0e1c] border border-[#1a1a30] p-6 text-center">
-          <p className="text-[#64748b] font-mono text-sm">
-            No specific verifiable claims were found in this content.
+        <div className="rounded-[12px] bg-[#0e0e1c] border border-[#1a1a30] p-6 text-center space-y-2">
+          <p className="text-[#e2e8f0] font-mono text-sm font-medium">
+            No checkable claims found
           </p>
+          <p
+            className="text-[#64748b] text-sm leading-relaxed"
+            style={{ fontFamily: "var(--font-lora), serif" }}
+          >
+            This video doesn&apos;t appear to contain specific factual statements — it may be entertainment, personal content, or opinion. Try a news or educational video for best results.
+          </p>
+        </div>
+      )}
+
+      {/* ── Sources ───────────────────────────────────────── */}
+      {uniqueSources.length > 0 && (
+        <div className="rounded-[12px] bg-[#0e0e1c] border border-[#1a1a30] overflow-hidden">
+          <div className="px-4 pt-3 pb-2.5 border-b border-[#1a1a30]">
+            <p className="font-mono text-xs uppercase tracking-wider text-[#64748b]">
+              Sources checked
+            </p>
+          </div>
+          <div className="px-4 py-3 space-y-2">
+            {uniqueSources.map((source, idx) => (
+              <a
+                key={idx}
+                href={source.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-2 group"
+              >
+                <svg
+                  className="w-3 h-3 flex-shrink-0 mt-0.5 text-[#3a3a55] group-hover:text-[#a78bfa] transition-colors"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                <div className="flex flex-col min-w-0">
+                  <span className="font-mono text-xs text-[#64748b] group-hover:text-[#a78bfa] transition-colors truncate">
+                    {source.name}
+                  </span>
+                  {source.date && (
+                    <span className="font-mono text-[10px] text-[#3a3a55]">
+                      {source.date}
+                    </span>
+                  )}
+                </div>
+              </a>
+            ))}
+          </div>
         </div>
       )}
 

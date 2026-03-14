@@ -53,9 +53,27 @@ function isValidUrl(url: string): boolean {
   }
 }
 
+/** Extract hostname without www. prefix */
+function getDomain(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "";
+  }
+}
+
 export default function ClaimCard({ claim }: ClaimCardProps) {
   const [expanded, setExpanded] = useState(false);
   const cfg = verdictConfig[claim.verdict] ?? verdictConfig.NO_EVIDENCE;
+
+  const domains = [
+    ...new Set(
+      (claim.sources ?? [])
+        .filter((s) => isValidUrl(s.url))
+        .map((s) => getDomain(s.url))
+        .filter(Boolean)
+    ),
+  ].slice(0, 3);
 
   return (
     <div
@@ -76,12 +94,19 @@ export default function ClaimCard({ claim }: ClaimCardProps) {
           >
             {cfg.label}
           </span>
-          <p
-            className="text-[#e2e8f0] text-sm leading-relaxed"
-            style={{ fontFamily: "var(--font-lora), serif" }}
-          >
-            {claim.text}
-          </p>
+          <div className="flex flex-col gap-1 flex-1 min-w-0">
+            <p
+              className="text-[#e2e8f0] text-sm leading-relaxed"
+              style={{ fontFamily: "var(--font-lora), serif" }}
+            >
+              {claim.text}
+            </p>
+            {domains.length > 0 && (
+              <p className="font-mono text-[10px] text-[#3a3a55]">
+                {domains.join(" · ")}
+              </p>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0 mt-0.5">

@@ -71,6 +71,15 @@ export default function Home() {
           >
             Fact-check anything. Instantly.
           </p>
+          <p
+            className="text-sm mt-1"
+            style={{
+              color: "#3a3a55",
+              fontFamily: "var(--font-lora), serif",
+            }}
+          >
+            Works best with news and educational videos.
+          </p>
           {/* Info button */}
           <button
             onClick={() => setShowInfo(true)}
