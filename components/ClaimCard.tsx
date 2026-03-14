@@ -96,11 +96,11 @@ export default function ClaimCard({ claim }: ClaimCardProps) {
       {/* Expanded section */}
       {expanded && (
         <div
-          className="px-4 pb-4 space-y-4 border-t"
+          className="border-t"
           style={{ borderColor: "#1a1a30" }}
         >
           {/* Explanation */}
-          <div className="pt-4">
+          <div className="px-4 pt-4 pb-4">
             <p className="text-xs font-mono font-semibold uppercase tracking-widest mb-2" style={{ color: "#475569" }}>
               Explanation
             </p>
@@ -112,22 +112,25 @@ export default function ClaimCard({ claim }: ClaimCardProps) {
             </p>
           </div>
 
-          {/* Confidence */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
+          {/* Confidence — own section with top divider for clear separation */}
+          <div
+            className="px-4 py-4 border-t"
+            style={{ borderColor: "#1a1a30", backgroundColor: "rgba(167,139,250,0.03)" }}
+          >
+            <div className="flex items-start justify-between gap-3 mb-3">
               <div>
-                <p className="text-xs font-mono font-semibold uppercase tracking-widest" style={{ color: "#475569" }}>
+                <p className="text-xs font-mono font-semibold uppercase tracking-widest" style={{ color: "#7c6faa" }}>
                   AI confidence in this verdict
                 </p>
-                <p className="text-xs font-mono mt-0.5" style={{ color: "#3a3a55" }}>
+                <p className="text-xs font-mono mt-1" style={{ color: "#3a3a55" }}>
                   How certain the AI is that the claim is {cfg.label.toLowerCase()}
                 </p>
               </div>
-              <span className="text-sm font-mono font-semibold flex-shrink-0 ml-3" style={{ color: cfg.color }}>
+              <span className="text-lg font-mono font-bold flex-shrink-0" style={{ color: cfg.color }}>
                 {Math.round(claim.confidence * 100)}%
               </span>
             </div>
-            <div className="bg-[#1a1a30] rounded-full h-1.5">
+            <div className="bg-[#1a1a30] rounded-full h-2">
               <div
                 className="h-full rounded-full transition-all duration-700"
                 style={{
@@ -140,8 +143,11 @@ export default function ClaimCard({ claim }: ClaimCardProps) {
 
           {/* Sources */}
           {claim.sources && claim.sources.some(s => isValidUrl(s.url)) && (
-            <div>
-              <p className="text-xs font-mono font-semibold uppercase tracking-widest mb-2" style={{ color: "#475569" }}>
+            <div
+              className="px-4 py-4 border-t"
+              style={{ borderColor: "#1a1a30" }}
+            >
+              <p className="text-xs font-mono font-semibold uppercase tracking-widest mb-3" style={{ color: "#475569" }}>
                 Resources
               </p>
               <div className="space-y-2">
