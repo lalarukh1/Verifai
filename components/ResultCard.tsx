@@ -316,8 +316,8 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
             </span>
           </div>
 
-          {/* Grid of claim cards */}
-          <div className="p-3 grid grid-cols-2 gap-3">
+          {/* Claim cards — single column so expand/collapse works cleanly */}
+          <div className="p-3 flex flex-col gap-3">
             {result.claims.map((claim, idx) => (
               <ClaimCard key={idx} claim={claim} />
             ))}
