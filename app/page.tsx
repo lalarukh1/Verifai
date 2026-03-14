@@ -59,45 +59,36 @@ export default function Home() {
 
   return (
     <main
-      className="min-h-screen flex flex-col items-center px-4 py-12"
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-12"
       style={{ backgroundColor: "#070711" }}
     >
-      <div className="w-full max-w-[680px]">
+      <div className="w-full max-w-[760px]">
         {/* Header */}
-        <div className="text-center mb-12 relative">
+        <div className="text-center mb-10">
           <h1
-            className="text-4xl font-bold mb-3 tracking-tight font-mono"
+            className="text-5xl font-bold mb-4 tracking-tight font-mono"
             style={{ color: "#e2e8f0" }}
           >
             Verif<span style={{ color: "#a78bfa" }}>AI</span>
           </h1>
           <p
-            className="text-base"
+            className="text-xl"
             style={{
-              color: "#64748b",
+              color: "#a0aec0",
               fontFamily: "var(--font-lora), serif",
             }}
           >
             Fact-check anything. Instantly.
           </p>
           <p
-            className="text-sm mt-1"
+            className="text-sm mt-2"
             style={{
-              color: "#3a3a55",
+              color: "#64748b",
               fontFamily: "var(--font-lora), serif",
             }}
           >
             Works best with news and educational content on Instagram and TikTok.
           </p>
-          {/* Info button */}
-          <button
-            onClick={() => setShowInfo(true)}
-            className="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full border font-mono text-sm transition-all duration-200 hover:border-[#3b2f6e] hover:text-[#a78bfa]"
-            style={{ borderColor: "#1a1a30", color: "#475569" }}
-            aria-label="How it works"
-          >
-            ⓘ
-          </button>
         </div>
 
         {/* Main content area */}
@@ -107,6 +98,7 @@ export default function Home() {
             isLoading={false}
             error={error}
             onExample={handleExample}
+            onInfoClick={() => setShowInfo(true)}
           />
         )}
 

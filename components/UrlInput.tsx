@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Platform } from "@/lib/types";
-import { EXAMPLES } from "@/lib/examples";
+import { EXAMPLES, Example } from "@/lib/examples";
 
 function detectPlatformFromUrl(url: string): Platform {
   if (/instagram\.com/.test(url)) return "instagram";
@@ -32,20 +32,110 @@ function PlatformIcon({ platform }: { platform: Platform }) {
   return null;
 }
 
+// ── Example card ────────────────────────────────────────────────────────────
+
+const verdictStyle: Record<string, { color: string; label: string }> = {
+  MISLEADING:  { color: "#f59e0b", label: "Misleading"  },
+  UNVERIFIED:  { color: "#94a3b8", label: "Unverified"  },
+  FALSE:       { color: "#ef4444", label: "False"       },
+  TRUSTWORTHY: { color: "#22c55e", label: "Trustworthy" },
+};
+
+function getExcerpt(text: string, maxLen = 100): string {
+  const first = text.split("\n")[0].trim();
+  return first.length > maxLen ? first.slice(0, maxLen).trimEnd() + "…" : first;
+}
+
+function ExampleCard({ example, onClick }: { example: Example; onClick: () => void }) {
+  const vs = verdictStyle[example.result.overallVerdict] ?? verdictStyle.UNVERIFIED;
+  const excerpt = getExcerpt(example.result.extractedContent.text);
+  const handle = example.result.extractedContent.accountHandle
+    ? `@${example.result.extractedContent.accountHandle}`
+    : example.result.accountSummary;
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex flex-col text-left rounded-[18px] border overflow-hidden transition-all duration-200 hover:-translate-y-0.5"
+      style={{
+        borderColor: "#1a1a30",
+        backgroundColor: "#0a0a18",
+      }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLButtonElement).style.borderColor = "#3b2f6e";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLButtonElement).style.borderColor = "#1a1a30";
+      }}
+    >
+      {/* Verdict colour accent bar */}
+      <div className="h-[3px] w-full" style={{ backgroundColor: vs.color, opacity: 0.7 }} />
+
+      {/* Body */}
+      <div className="p-5 flex flex-col gap-3 flex-1">
+
+        {/* Platform + account */}
+        <div className="flex items-center gap-2">
+          <span
+            className={example.platform === "instagram" ? "text-pink-400" : "text-cyan-400"}
+            style={{ flexShrink: 0 }}
+          >
+            {example.platform === "instagram" ? <InstagramIcon /> : <TikTokIcon />}
+          </span>
+          <span className="text-xs font-mono truncate" style={{ color: "#64748b" }}>
+            {handle}
+          </span>
+        </div>
+
+        {/* Text excerpt */}
+        <p
+          className="text-sm leading-relaxed"
+          style={{ color: "#cbd5e1", fontFamily: "var(--font-lora), serif" }}
+        >
+          {excerpt}
+        </p>
+
+        {/* Footer: verdict + CTA */}
+        <div
+          className="flex items-center justify-between pt-3 mt-auto border-t"
+          style={{ borderColor: "#1a1a30" }}
+        >
+          <span className="text-xs font-mono font-medium" style={{ color: vs.color }}>
+            ● {vs.label}
+          </span>
+          <span className="text-xs font-mono" style={{ color: "#3a3a55" }}>
+            preview →
+          </span>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+// ── Main component ───────────────────────────────────────────────────────────
+
 interface UrlInputProps {
   onSubmit: (url: string) => void;
   isLoading: boolean;
   error?: string | null;
   onExample?: (index: number) => void;
+  onInfoClick?: () => void;
 }
 
 const platformColors: Record<Platform, string> = {
   instagram: "text-pink-400",
-  tiktok: "text-cyan-400",
-  unknown: "text-slate-500",
+  tiktok:    "text-cyan-400",
+  unknown:   "text-slate-500",
 };
 
-export default function UrlInput({ onSubmit, isLoading, error, onExample }: UrlInputProps) {
+export default function UrlInput({
+  onSubmit,
+  isLoading,
+  error,
+  onExample,
+  onInfoClick,
+}: UrlInputProps) {
   const [url, setUrl] = useState("");
   const [platform, setPlatform] = useState<Platform>("unknown");
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -64,9 +154,7 @@ export default function UrlInput({ onSubmit, isLoading, error, onExample }: UrlI
     }
     const p = detectPlatformFromUrl(url.trim());
     if (p === "unknown") {
-      setValidationError(
-        "Please enter an Instagram or TikTok URL."
-      );
+      setValidationError("Please enter an Instagram or TikTok URL.");
       return;
     }
     onSubmit(url.trim());
@@ -77,6 +165,8 @@ export default function UrlInput({ onSubmit, isLoading, error, onExample }: UrlI
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
+
+      {/* URL input */}
       <div className="relative">
         <div className="relative flex items-center">
           {hasPlatform && (
@@ -90,12 +180,12 @@ export default function UrlInput({ onSubmit, isLoading, error, onExample }: UrlI
             type="text"
             value={url}
             onChange={(e) => handleChange(e.target.value)}
-            placeholder="Paste an Instagram or TikTok URL..."
+            placeholder="Paste an Instagram or TikTok URL…"
             disabled={isLoading}
             className={`
-              w-full bg-[#0e0e1c] border border-[#1a1a30] rounded-[12px]
-              text-[#e2e8f0] placeholder-[#64748b]
-              ${hasPlatform ? "pl-11" : "pl-4"} pr-4 py-4
+              w-full bg-[#0e0e1c] border border-[#1a1a30] rounded-[14px]
+              text-[#e2e8f0] placeholder-[#475569]
+              ${hasPlatform ? "pl-11" : "pl-5"} pr-5 py-4
               font-mono text-sm
               focus:outline-none focus:border-[#a78bfa] focus:ring-1 focus:ring-[#a78bfa]
               transition-all duration-200
@@ -108,47 +198,56 @@ export default function UrlInput({ onSubmit, isLoading, error, onExample }: UrlI
         )}
       </div>
 
+      {/* Submit button */}
       <button
         type="submit"
         disabled={isLoading || !url.trim()}
         className={`
-          mt-4 w-full py-4 rounded-[12px] font-mono text-sm font-medium
+          mt-4 w-full py-4 rounded-[14px] font-mono text-sm font-semibold
           transition-all duration-200
           ${
             isLoading || !url.trim()
-              ? "bg-[#1a1a30] text-[#64748b] cursor-not-allowed"
+              ? "bg-[#1a1a30] text-[#475569] cursor-not-allowed"
               : "bg-[#a78bfa] hover:bg-[#9370f5] text-[#070711] cursor-pointer"
           }
         `}
       >
-        {isLoading ? "Analysing..." : "Fact Check"}
+        {isLoading ? "Analysing…" : "Fact Check"}
       </button>
 
-      {/* Example chips */}
+      {/* Example cards */}
       {onExample && (
-        <div className="mt-5">
-          <p className="text-xs font-mono text-center mb-2.5" style={{ color: "#3a3a55" }}>
-            or try an example
-          </p>
-          <div className="flex gap-2">
+        <div className="mt-10">
+          {/* Section divider */}
+          <div className="flex items-center gap-4 mb-5">
+            <div className="flex-1 h-px" style={{ backgroundColor: "#1a1a30" }} />
+            <p className="text-xs font-mono whitespace-nowrap" style={{ color: "#475569" }}>
+              or see it in action
+            </p>
+            <div className="flex-1 h-px" style={{ backgroundColor: "#1a1a30" }} />
+          </div>
+
+          {/* Cards grid */}
+          <div className="grid grid-cols-2 gap-4">
             {EXAMPLES.map((ex, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => onExample(i)}
-                className="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-[10px] border transition-all duration-200 hover:border-[#3b2f6e] hover:bg-[#0e0e1c] text-left"
-                style={{ borderColor: "#1a1a30", backgroundColor: "#0a0a18" }}
-              >
-                <span className={ex.platform === "instagram" ? "text-pink-400" : "text-cyan-400"} style={{ flexShrink: 0 }}>
-                  {ex.platform === "instagram" ? <InstagramIcon /> : <TikTokIcon />}
-                </span>
-                <span className="text-xs font-mono truncate" style={{ color: "#64748b" }}>
-                  {ex.label}
-                </span>
-              </button>
+              <ExampleCard key={i} example={ex} onClick={() => onExample(i)} />
             ))}
           </div>
         </div>
+      )}
+
+      {/* Info link */}
+      {onInfoClick && (
+        <button
+          type="button"
+          onClick={onInfoClick}
+          className="mt-8 w-full flex items-center justify-center gap-2 py-3 rounded-[12px] border font-mono text-sm transition-all duration-200 hover:border-[#3b2f6e] hover:text-[#a78bfa]"
+          style={{ borderColor: "#1a1a30", color: "#64748b", backgroundColor: "transparent" }}
+        >
+          <span>ⓘ</span>
+          <span>Find out how VerifAI works</span>
+          <span style={{ color: "#3a3a55" }}>→</span>
+        </button>
       )}
     </form>
   );
