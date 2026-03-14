@@ -359,7 +359,7 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
                 Read it yourself
               </span>
               <p className="font-mono text-xs mt-0.5" style={{ color: "#2a6070" }}>
-                {uniqueSources.length} source{uniqueSources.length !== 1 ? "s" : ""} used to fact-check this post — open any to verify
+                {uniqueSources.length} source{uniqueSources.length !== 1 ? "s" : ""} used to fact-check this post, open any to verify
               </p>
             </div>
           </div>
