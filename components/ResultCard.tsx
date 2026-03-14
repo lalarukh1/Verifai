@@ -243,39 +243,53 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
 
       {/* ── Credibility score ─────────────────────────────── */}
       <div
-        className="rounded-[18px] border p-5"
-        style={{ backgroundColor: "#0a0a18", borderColor: "#1a1a30" }}
+        className="rounded-[18px] border overflow-hidden"
+        style={{ backgroundColor: "#0b0b1f", borderColor: "#252540" }}
       >
-        <p className="text-xs font-mono uppercase tracking-widest mb-4" style={{ color: "#475569" }}>
-          Credibility Score
-        </p>
-        <div className="flex items-center gap-6">
-          <ScoreRing value={result.credibilityScore} label="Credibility" color="#a78bfa" />
-          <div className="flex-1 space-y-3">
-            {scoreFactors.map((f) => (
-              <div key={f.label} className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
+        {/* Header */}
+        <div
+          className="flex items-center gap-2.5 px-5 py-3.5 border-b"
+          style={{ backgroundColor: "rgba(167,139,250,0.05)", borderColor: "#1e1e38" }}
+        >
+          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: "#a78bfa" }} />
+          <span className="font-mono text-sm font-semibold" style={{ color: "#c4b5fd" }}>
+            Credibility Score
+          </span>
+          <span className="font-mono text-xs ml-auto" style={{ color: "#4c3d7a" }}>
+            out of 100
+          </span>
+        </div>
+
+        {/* Body */}
+        <div className="p-5">
+          <div className="flex items-center gap-6">
+            <ScoreRing value={result.credibilityScore} label="Credibility" color="#a78bfa" />
+            <div className="flex-1 space-y-3.5">
+              {scoreFactors.map((f) => (
+                <div key={f.label} className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2.5">
+                    <span
+                      className="font-mono text-sm w-4 text-center flex-shrink-0"
+                      style={{ color: f.active ? (f.positive ? "#34d399" : "#f97316") : "#2a2a45" }}
+                    >
+                      {f.active ? (f.positive ? "✓" : "✗") : "–"}
+                    </span>
+                    <span
+                      className="font-mono text-sm"
+                      style={{ color: f.active ? "#94a3b8" : "#3a3a55" }}
+                    >
+                      {f.label}
+                    </span>
+                  </div>
                   <span
-                    className="font-mono text-sm w-4 text-center"
+                    className="font-mono text-sm font-medium flex-shrink-0"
                     style={{ color: f.active ? (f.positive ? "#34d399" : "#f97316") : "#2a2a45" }}
                   >
-                    {f.active ? (f.positive ? "✓" : "✗") : "–"}
-                  </span>
-                  <span
-                    className="font-mono text-sm"
-                    style={{ color: f.active ? "#94a3b8" : "#3a3a55" }}
-                  >
-                    {f.label}
+                    {f.active ? f.delta : "—"}
                   </span>
                 </div>
-                <span
-                  className="font-mono text-sm font-medium"
-                  style={{ color: f.active ? (f.positive ? "#34d399" : "#f97316") : "#2a2a45" }}
-                >
-                  {f.active ? f.delta : "—"}
-                </span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -283,7 +297,7 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
       {/* ── Claims ────────────────────────────────────────── */}
       {result.claims.length > 0 ? (
         <div className="space-y-3">
-          <p className="font-mono text-sm font-semibold" style={{ color: "#64748b" }}>
+          <p className="font-mono text-sm font-semibold" style={{ color: "#94a3b8" }}>
             {result.claims.length} Claim{result.claims.length !== 1 ? "s" : ""} Analysed
           </p>
           {result.claims.map((claim, idx) => (
@@ -311,14 +325,26 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
       {uniqueSources.length > 0 && (
         <div
           className="rounded-[18px] border overflow-hidden"
-          style={{ backgroundColor: "#0a0a18", borderColor: "#1a1a30" }}
+          style={{ backgroundColor: "#080813", borderColor: "#161628" }}
         >
-          <div className="px-5 pt-4 pb-3 border-b" style={{ borderColor: "#1a1a30" }}>
-            <p className="font-mono text-sm font-semibold" style={{ color: "#64748b" }}>
+          {/* Header */}
+          <div
+            className="flex items-center gap-2.5 px-5 py-3.5 border-b"
+            style={{ backgroundColor: "rgba(34,211,238,0.04)", borderColor: "#131325" }}
+          >
+            <svg className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#22d3ee" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+            </svg>
+            <span className="font-mono text-sm font-semibold" style={{ color: "#67e8f9" }}>
               Sources checked
-            </p>
+            </span>
+            <span className="font-mono text-xs ml-auto" style={{ color: "#164e63" }}>
+              {uniqueSources.length} source{uniqueSources.length !== 1 ? "s" : ""}
+            </span>
           </div>
-          <div className="px-5 py-4 space-y-3">
+
+          {/* List */}
+          <div className="px-5 py-4 space-y-4">
             {uniqueSources.map((source, idx) => (
               <a
                 key={idx}
@@ -329,18 +355,18 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
               >
                 <svg
                   className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 transition-colors"
-                  style={{ color: "#3a3a55" }}
+                  style={{ color: "#1e3a4a" }}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
-                  onMouseEnter={e => (e.currentTarget.style.color = "#a78bfa")}
-                  onMouseLeave={e => (e.currentTarget.style.color = "#3a3a55")}
+                  onMouseEnter={e => (e.currentTarget.style.color = "#22d3ee")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "#1e3a4a")}
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
                 <div className="flex flex-col min-w-0">
                   <span
-                    className="font-mono text-sm truncate transition-colors group-hover:text-[#a78bfa]"
+                    className="font-mono text-sm truncate transition-colors group-hover:text-[#22d3ee]"
                     style={{ color: "#94a3b8" }}
                   >
                     {source.name}
