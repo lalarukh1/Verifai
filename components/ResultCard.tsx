@@ -131,9 +131,9 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
 
           {/* Platform + account row */}
           <div className="flex items-start gap-3 mb-4">
-            {/* Thumbnail or platform icon block */}
-            <div className="relative flex-shrink-0">
-              {showThumb ? (
+            {/* Thumbnail (always shown when available) */}
+            {showThumb && (
+              <div className="relative flex-shrink-0">
                 <img
                   src={ec.thumbnailUrl}
                   alt="Post thumbnail"
@@ -141,31 +141,19 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
                   style={{ border: "1px solid #1a1a30" }}
                   onError={() => setThumbError(true)}
                 />
-              ) : (
-                <div
-                  className="w-14 h-14 rounded-[12px] flex items-center justify-center"
-                  style={{ backgroundColor: "#13132a", border: "1px solid #1a1a30", color: platformColor }}
-                >
-                  {isInstagram ? <InstagramIcon className="w-6 h-6" /> : <TikTokIcon className="w-6 h-6" />}
-                </div>
-              )}
-              {/* Platform badge overlay (only when thumbnail is showing) */}
-              {showThumb && (
-                <div
-                  className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: "#0a0a18", border: `1.5px solid ${platformColor}`, color: platformColor }}
-                >
-                  {isInstagram
-                    ? <InstagramIcon className="w-3 h-3" />
-                    : <TikTokIcon className="w-3 h-3" />}
-                </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Account info */}
             <div className="flex-1 min-w-0 pt-0.5">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 flex-wrap min-w-0">
+                  {/* Platform icon — always visible */}
+                  <span style={{ color: platformColor }} className="flex-shrink-0">
+                    {isInstagram
+                      ? <InstagramIcon className="w-4 h-4" />
+                      : <TikTokIcon className="w-4 h-4" />}
+                  </span>
                   <span
                     className="font-mono text-base font-semibold"
                     style={{ color: "#e2e8f0" }}
