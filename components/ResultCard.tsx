@@ -363,41 +363,63 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
           </div>
 
           {/* List */}
-          <div className="px-5 py-4 space-y-4">
-            {uniqueSources.map((source, idx) => (
-              <a
-                key={idx}
-                href={source.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-start gap-3 group"
-              >
-                <svg
-                  className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 transition-colors"
-                  style={{ color: "#1e3a4a" }}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  onMouseEnter={e => (e.currentTarget.style.color = "#22d3ee")}
-                  onMouseLeave={e => (e.currentTarget.style.color = "#1e3a4a")}
+          <div className="p-3 flex flex-col gap-2">
+            {uniqueSources.map((source, idx) => {
+              const domain = (() => { try { return new URL(source.url).hostname.replace(/^www\./, ""); } catch { return ""; } })();
+              return (
+                <a
+                  key={idx}
+                  href={source.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 rounded-[12px] px-4 py-3 border transition-all duration-200 group"
+                  style={{ backgroundColor: "#0c0c1a", borderColor: "#161628" }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#1e4a55"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#161628"; }}
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-                <div className="flex flex-col min-w-0">
+                  {/* Index number */}
                   <span
-                    className="font-mono text-sm truncate transition-colors group-hover:text-[#22d3ee]"
-                    style={{ color: "#94a3b8" }}
+                    className="font-mono text-xs w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: "#0f2a33", color: "#22d3ee" }}
                   >
-                    {source.name}
+                    {idx + 1}
                   </span>
-                  {source.date && (
-                    <span className="font-mono text-xs mt-0.5" style={{ color: "#475569" }}>
-                      {source.date}
-                    </span>
-                  )}
-                </div>
-              </a>
-            ))}
+
+                  {/* Name + domain */}
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className="text-sm font-mono truncate transition-colors group-hover:text-[#67e8f9]"
+                      style={{ color: "#cbd5e1" }}
+                    >
+                      {source.name}
+                    </p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      {domain && (
+                        <span className="font-mono text-xs" style={{ color: "#2a4a55" }}>
+                          {domain}
+                        </span>
+                      )}
+                      {source.date && (
+                        <span className="font-mono text-xs" style={{ color: "#2a4a55" }}>
+                          · {source.date}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Arrow */}
+                  <svg
+                    width="12" height="12" viewBox="0 0 10 10" fill="none"
+                    className="flex-shrink-0 transition-colors"
+                    style={{ color: "#1e3a4a" }}
+                    onMouseEnter={e => (e.currentTarget.style.color = "#22d3ee")}
+                    onMouseLeave={e => (e.currentTarget.style.color = "#1e3a4a")}
+                  >
+                    <path d="M1.5 8.5L8.5 1.5M8.5 1.5H3.5M8.5 1.5V6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </a>
+              );
+            })}
           </div>
         </div>
       )}
