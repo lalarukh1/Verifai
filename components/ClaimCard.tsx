@@ -115,10 +115,15 @@ export default function ClaimCard({ claim }: ClaimCardProps) {
           {/* Confidence */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-mono font-semibold uppercase tracking-widest" style={{ color: "#475569" }}>
-                Confidence
-              </p>
-              <span className="text-sm font-mono font-semibold" style={{ color: cfg.color }}>
+              <div>
+                <p className="text-xs font-mono font-semibold uppercase tracking-widest" style={{ color: "#475569" }}>
+                  AI confidence in this verdict
+                </p>
+                <p className="text-xs font-mono mt-0.5" style={{ color: "#3a3a55" }}>
+                  How certain the AI is that the claim is {cfg.label.toLowerCase()}
+                </p>
+              </div>
+              <span className="text-sm font-mono font-semibold flex-shrink-0 ml-3" style={{ color: cfg.color }}>
                 {Math.round(claim.confidence * 100)}%
               </span>
             </div>
