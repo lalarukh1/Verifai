@@ -296,13 +296,32 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
 
       {/* ── Claims ────────────────────────────────────────── */}
       {result.claims.length > 0 ? (
-        <div className="space-y-3">
-          <p className="font-mono text-sm font-semibold" style={{ color: "#94a3b8" }}>
-            {result.claims.length} Claim{result.claims.length !== 1 ? "s" : ""} Analysed
-          </p>
-          {result.claims.map((claim, idx) => (
-            <ClaimCard key={idx} claim={claim} />
-          ))}
+        <div
+          className="rounded-[18px] border overflow-hidden"
+          style={{ backgroundColor: "#09090e", borderColor: "#1a1a30" }}
+        >
+          {/* Header */}
+          <div
+            className="flex items-center gap-2.5 px-5 py-3.5 border-b"
+            style={{ backgroundColor: "rgba(148,163,184,0.04)", borderColor: "#141420" }}
+          >
+            <svg className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#94a3b8" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <span className="font-mono text-sm font-semibold" style={{ color: "#94a3b8" }}>
+              {result.claims.length} Claim{result.claims.length !== 1 ? "s" : ""} Analysed
+            </span>
+            <span className="font-mono text-xs ml-auto" style={{ color: "#3a3a55" }}>
+              tap to expand
+            </span>
+          </div>
+
+          {/* Grid of claim cards */}
+          <div className="p-3 grid grid-cols-2 gap-3">
+            {result.claims.map((claim, idx) => (
+              <ClaimCard key={idx} claim={claim} />
+            ))}
+          </div>
         </div>
       ) : (
         <div
