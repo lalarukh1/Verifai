@@ -164,18 +164,32 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
 
             {/* Account info */}
             <div className="flex-1 min-w-0 pt-0.5">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span
-                  className="font-mono text-base font-semibold"
-                  style={{ color: "#e2e8f0" }}
-                >
-                  {ec.accountHandle ? `@${ec.accountHandle}` : "Unknown account"}
-                </span>
-                {ec.accountFollowers != null && (
-                  <span className="font-mono text-xs" style={{ color: "#64748b" }}>
-                    {formatFollowers(ec.accountFollowers)} followers
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 flex-wrap min-w-0">
+                  <span
+                    className="font-mono text-base font-semibold"
+                    style={{ color: "#e2e8f0" }}
+                  >
+                    {ec.accountHandle ? `@${ec.accountHandle}` : "Unknown account"}
                   </span>
-                )}
+                  {ec.accountFollowers != null && (
+                    <span className="font-mono text-xs" style={{ color: "#64748b" }}>
+                      {formatFollowers(ec.accountFollowers)} followers
+                    </span>
+                  )}
+                </div>
+                <a
+                  href={ec.postUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-xs font-mono flex-shrink-0 transition-colors duration-200 hover:text-[#a78bfa]"
+                  style={{ color: "#475569" }}
+                >
+                  View post
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className="flex-shrink-0">
+                    <path d="M1.5 8.5L8.5 1.5M8.5 1.5H3.5M8.5 1.5V6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </a>
               </div>
               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                 <span
@@ -197,39 +211,12 @@ export default function ResultCard({ result, onReset }: ResultCardProps) {
           {/* Text excerpt */}
           {excerpt && (
             <p
-              className="text-sm leading-relaxed mb-4 line-clamp-4"
+              className="text-sm leading-relaxed line-clamp-4"
               style={{ color: "#94a3b8", fontFamily: "var(--font-lora), serif" }}
             >
               &ldquo;{excerpt}{rawText.trim().length > 220 ? "…" : ""}&rdquo;
             </p>
           )}
-
-          {/* Footer: verdict + view original */}
-          <div
-            className="flex items-center justify-between pt-3 border-t"
-            style={{ borderColor: "#1a1a30" }}
-          >
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-mono font-semibold" style={{ color: cfg.color }}>
-                ● {cfg.label}
-              </span>
-              <span className="text-xs font-mono" style={{ color: "#3a3a55" }}>
-                · {result.claims.length} claim{result.claims.length !== 1 ? "s" : ""}
-              </span>
-            </div>
-            <a
-              href={ec.postUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs font-mono transition-colors duration-200 hover:text-[#a78bfa]"
-              style={{ color: "#475569" }}
-            >
-              View post
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className="flex-shrink-0">
-                <path d="M1.5 8.5L8.5 1.5M8.5 1.5H3.5M8.5 1.5V6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </a>
-          </div>
         </div>
       </div>
 
