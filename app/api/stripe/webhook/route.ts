@@ -2,12 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { markAsPaid } from "@/lib/redis";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
-// Disable body parsing so we can verify the raw body signature
-export const config = { api: { bodyParser: false } };
-
 export async function POST(req: NextRequest) {
+  // Initialise lazily so missing env vars don't blow up at build time
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "");
+
   const body = await req.text();
   const sig = req.headers.get("stripe-signature") ?? "";
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET ?? "";
