@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Dark background matching app theme -->
+  <rect width="32" height="32" rx="8" fill="#0c0c1e"/>
+  <!-- V lettermark in brand purple -->
+  <path d="M8 9 L16 23 L24 9" stroke="#a78bfa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Small checkmark dot at bottom of V (verified) -->
+  <circle cx="16" cy="24" r="1.5" fill="#7c6fe0"/>
+</svg>

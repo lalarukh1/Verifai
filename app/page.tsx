@@ -22,11 +22,14 @@ export default function Home() {
   const [showInfo, setShowInfo] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
+  // Prevents email gate flashing on refresh before localStorage is read
+  const [mounted, setMounted] = useState(false);
 
-  // On mount: restore saved email from localStorage
+  // On mount: restore saved email from localStorage, then show UI
   useEffect(() => {
     const saved = localStorage.getItem(LS_EMAIL_KEY);
     if (saved) setEmail(saved);
+    setMounted(true);
   }, []);
 
   function handleEmailSubmit(submittedEmail: string, marketingOptIn: boolean) {
@@ -148,8 +151,8 @@ export default function Home() {
       {/* Info modal */}
       {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
 
-      {/* Email gate — shown until user provides their email */}
-      {!email && <EmailGateModal onSubmit={handleEmailSubmit} />}
+      {/* Email gate — only render after mount so localStorage is read first (no flash) */}
+      {mounted && !email && <EmailGateModal onSubmit={handleEmailSubmit} />}
 
       {/* Paywall — shown when free limit is reached */}
       {showPaywall && email && <PaywallModal email={email} />}
