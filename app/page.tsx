@@ -33,6 +33,14 @@ export default function Home() {
     localStorage.setItem(LS_EMAIL_KEY, submittedEmail);
     localStorage.setItem(LS_MARKETING_KEY, String(marketingOptIn));
     setEmail(submittedEmail);
+
+    // Persist to Redis so signups are visible in Upstash console
+    // Fire-and-forget — don't block the UI on this
+    fetch("/api/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: submittedEmail, marketingOptIn }),
+    }).catch(() => {/* silent — non-critical */});
   }
 
   async function handleSubmit(url: string) {
