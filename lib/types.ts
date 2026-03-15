@@ -56,4 +56,6 @@ export interface CheckResponse {
   result?: AnalysisResult;
   error?: string;
   rateLimited?: boolean;
+  paywalled?: boolean;
+  checksRemaining?: number;
 }

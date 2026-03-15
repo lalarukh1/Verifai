@@ -10,6 +10,8 @@ interface Section {
   body: string;
 }
 
+const FREE_LIMIT = Number(process.env.NEXT_PUBLIC_FREE_CHECK_LIMIT ?? 10);
+
 const sections: Section[] = [
   {
     icon: "🤖",
@@ -30,6 +32,11 @@ const sections: Section[] = [
     icon: "📊",
     title: "How the credibility score works",
     body: "The score starts at 50 (neutral). It goes up by 20 if the account has over 100,000 followers, and up by 10 if the claims have verifiable sources. It goes down by 20 if the overall verdict is False or Misleading. The final number sits between 0 and 100.",
+  },
+  {
+    icon: "✨",
+    title: "Free & paid",
+    body: `Your first ${FREE_LIMIT} checks are completely free — no credit card required. After that, VerifAI is £4.99/month for unlimited checks. Cancel anytime.`,
   },
 ];
 

@@ -1,22 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import UrlInput from "@/components/UrlInput";
 import LoadingState from "@/components/LoadingState";
 import ResultCard from "@/components/ResultCard";
 import InfoModal from "@/components/InfoModal";
+import EmailGateModal from "@/components/EmailGateModal";
+import PaywallModal from "@/components/PaywallModal";
 import { AnalysisResult, CheckResponse } from "@/lib/types";
 import { EXAMPLES } from "@/lib/examples";
 
 type Stage = "input" | "loading" | "result";
+
+const LS_EMAIL_KEY = "verifai_email";
+const LS_MARKETING_KEY = "verifai_marketing_optin";
 
 export default function Home() {
   const [stage, setStage] = useState<Stage>("input");
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showInfo, setShowInfo] = useState(false);
+  const [email, setEmail] = useState<string | null>(null);
+  const [showPaywall, setShowPaywall] = useState(false);
+
+  // On mount: restore saved email from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem(LS_EMAIL_KEY);
+    if (saved) setEmail(saved);
+  }, []);
+
+  function handleEmailSubmit(submittedEmail: string, marketingOptIn: boolean) {
+    localStorage.setItem(LS_EMAIL_KEY, submittedEmail);
+    localStorage.setItem(LS_MARKETING_KEY, String(marketingOptIn));
+    setEmail(submittedEmail);
+  }
 
   async function handleSubmit(url: string) {
+    if (!email) return; // shouldn't happen — gate modal blocks this
     setError(null);
     setStage("loading");
 
@@ -24,10 +44,16 @@ export default function Home() {
       const res = await fetch("/api/check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({ url, email }),
       });
 
       const data = (await res.json()) as CheckResponse;
+
+      if (data.paywalled) {
+        setShowPaywall(true);
+        setStage("input");
+        return;
+      }
 
       if (!data.success || !data.result) {
         setError(data.error ?? "An unexpected error occurred.");
@@ -59,37 +85,39 @@ export default function Home() {
 
   return (
     <main
-      className="min-h-screen flex flex-col items-center justify-center px-4 py-12"
+      className={`min-h-screen flex flex-col items-center px-4 py-12 ${stage === "result" ? "justify-start" : "justify-center"}`}
       style={{ backgroundColor: "#070711" }}
     >
       <div className="w-full max-w-[760px]">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <h1
-            className="text-5xl font-bold mb-4 tracking-tight font-mono"
-            style={{ color: "#e2e8f0" }}
-          >
-            Verif<span style={{ color: "#a78bfa" }}>AI</span>
-          </h1>
-          <p
-            className="text-xl"
-            style={{
-              color: "#a0aec0",
-              fontFamily: "var(--font-lora), serif",
-            }}
-          >
-            Fact-check anything. Instantly.
-          </p>
-          <p
-            className="text-sm mt-2"
-            style={{
-              color: "#64748b",
-              fontFamily: "var(--font-lora), serif",
-            }}
-          >
-            Verify news and information in Instagram Reels and TikToks before you share.
-          </p>
-        </div>
+        {/* Header — hidden on results page (ResultCard has its own) */}
+        {stage !== "result" && (
+          <div className="text-center mb-10">
+            <h1
+              className="text-5xl font-bold mb-4 tracking-tight font-mono"
+              style={{ color: "#e2e8f0" }}
+            >
+              Verif<span style={{ color: "#a78bfa" }}>AI</span>
+            </h1>
+            <p
+              className="text-xl"
+              style={{
+                color: "#a0aec0",
+                fontFamily: "var(--font-lora), serif",
+              }}
+            >
+              Fact-check anything. Instantly.
+            </p>
+            <p
+              className="text-sm mt-2"
+              style={{
+                color: "#64748b",
+                fontFamily: "var(--font-lora), serif",
+              }}
+            >
+              Verify news and information in Instagram Reels and TikToks before you share.
+            </p>
+          </div>
+        )}
 
         {/* Main content area */}
         {stage === "input" && (
@@ -111,6 +139,12 @@ export default function Home() {
 
       {/* Info modal */}
       {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
+
+      {/* Email gate — shown until user provides their email */}
+      {!email && <EmailGateModal onSubmit={handleEmailSubmit} />}
+
+      {/* Paywall — shown when free limit is reached */}
+      {showPaywall && email && <PaywallModal email={email} />}
     </main>
   );
 }

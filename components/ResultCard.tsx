@@ -141,51 +141,67 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
   return (
     <div className="w-full space-y-4">
 
-      {/* ── Top nav row ───────────────────────────────────── */}
-      <div className="flex items-center justify-center gap-3 mb-6">
-        <button
-          onClick={onReset}
-          className="flex items-center gap-2 font-mono text-sm px-4 py-2 rounded-full border transition-all duration-200 hover:text-[#a78bfa] hover:border-[#3b2f6e]"
-          style={{ backgroundColor: "#0a0a18", borderColor: "#2e2e50", color: "#64748b" }}
-        >
-          <svg width="13" height="13" viewBox="0 0 12 12" fill="none" className="flex-shrink-0">
-            <path d="M8 2L4 6L8 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          Go back
-        </button>
-        <button
-          onClick={handleDownload}
-          disabled={downloading}
-          className="flex items-center gap-2 font-mono text-sm px-4 py-2 rounded-full border transition-all duration-200 hover:text-[#a78bfa] hover:border-[#3b2f6e] disabled:opacity-50"
-          style={{ backgroundColor: "#0a0a18", borderColor: "#2e2e50", color: "#64748b" }}
-        >
-          {downloading ? (
-            <>
-              <svg className="w-3.5 h-3.5 animate-spin flex-shrink-0" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3"/>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
-              </svg>
-              Saving…
-            </>
-          ) : (
-            <>
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" className="flex-shrink-0">
-                <path d="M6.5 1v7M6.5 8l-2.5-2.5M6.5 8l2.5-2.5M1.5 10v1.5a.5.5 0 00.5.5h9a.5.5 0 00.5-.5V10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              Save
-            </>
-          )}
-        </button>
-        {onInfoClick && (
+      {/* ── Header ────────────────────────────────────────── */}
+      <div className="grid grid-cols-3 items-center mb-6">
+
+        {/* Left — Go back */}
+        <div className="flex justify-start">
           <button
-            onClick={onInfoClick}
-            className="flex items-center gap-2 font-mono text-sm px-4 py-2 rounded-full border transition-all duration-200 hover:text-[#a78bfa] hover:border-[#3b2f6e]"
+            onClick={onReset}
+            className="flex items-center gap-1.5 font-mono text-sm px-3.5 py-2 rounded-full border transition-all duration-200 hover:text-[#a78bfa] hover:border-[#3b2f6e]"
             style={{ backgroundColor: "#0a0a18", borderColor: "#2e2e50", color: "#64748b" }}
           >
-            <span>ⓘ</span>
-            How it works
+            <svg width="13" height="13" viewBox="0 0 12 12" fill="none" className="flex-shrink-0">
+              <path d="M8 2L4 6L8 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Go back
           </button>
-        )}
+        </div>
+
+        {/* Centre — Logo */}
+        <div className="flex justify-center">
+          <span className="font-mono text-lg font-bold tracking-tight" style={{ color: "#e2e8f0" }}>
+            Verif<span style={{ color: "#a78bfa" }}>AI</span>
+          </span>
+        </div>
+
+        {/* Right — Save + Info */}
+        <div className="flex justify-end items-center gap-2">
+          <button
+            onClick={handleDownload}
+            disabled={downloading}
+            className="flex items-center gap-1.5 font-mono text-sm px-3.5 py-2 rounded-full border transition-all duration-200 hover:text-[#a78bfa] hover:border-[#3b2f6e] disabled:opacity-50"
+            style={{ backgroundColor: "#0a0a18", borderColor: "#2e2e50", color: "#64748b" }}
+          >
+            {downloading ? (
+              <>
+                <svg className="w-3.5 h-3.5 animate-spin flex-shrink-0" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                </svg>
+                Saving…
+              </>
+            ) : (
+              <>
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" className="flex-shrink-0">
+                  <path d="M6.5 1v7M6.5 8l-2.5-2.5M6.5 8l2.5-2.5M1.5 10v1.5a.5.5 0 00.5.5h9a.5.5 0 00.5-.5V10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Save
+              </>
+            )}
+          </button>
+          {onInfoClick && (
+            <button
+              onClick={onInfoClick}
+              title="How VerifAI works"
+              className="w-9 h-9 flex items-center justify-center rounded-full border font-mono text-sm transition-all duration-200 hover:text-[#a78bfa] hover:border-[#3b2f6e]"
+              style={{ backgroundColor: "#0a0a18", borderColor: "#2e2e50", color: "#64748b" }}
+            >
+              ⓘ
+            </button>
+          )}
+        </div>
+
       </div>
 
       {/* ── Capturable content ────────────────────────────── */}

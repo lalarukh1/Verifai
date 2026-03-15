@@ -5,6 +5,7 @@ import { transcribeFromUrl } from "@/lib/deepgram";
 import { analyseContent } from "@/lib/claude";
 import { enrichClaimsWithSearch } from "@/lib/search";
 import { AnalysisResult, CheckResponse } from "@/lib/types";
+import { getCheckCount, incrementCheckCount, isPaidUser, FREE_CHECK_LIMIT } from "@/lib/redis";
 
 export const maxDuration = 60;
 
@@ -42,9 +43,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(response, { status: 429 });
   }
 
-  let body: { url?: string };
+  let body: { url?: string; email?: string };
   try {
-    body = (await req.json()) as { url?: string };
+    body = (await req.json()) as { url?: string; email?: string };
   } catch {
     return NextResponse.json(
       { success: false, error: "Invalid request body." },
@@ -52,7 +53,36 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { url } = body;
+  const { url, email } = body;
+
+  // ── EMAIL GATING ─────────────────────────────────────────────
+  if (!email || typeof email !== "string" || !email.includes("@")) {
+    return NextResponse.json(
+      { success: false, error: "A valid email address is required." },
+      { status: 400 }
+    );
+  }
+
+  // Admin emails bypass all limits
+  const adminEmails = (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  const isAdmin = adminEmails.includes(email.toLowerCase().trim());
+
+  const [count, paid] = isAdmin
+    ? [0, true]
+    : await Promise.all([getCheckCount(email), isPaidUser(email)]);
+
+  if (!isAdmin && count >= FREE_CHECK_LIMIT && !paid) {
+    const response: CheckResponse = {
+      success: false,
+      paywalled: true,
+      checksRemaining: 0,
+      error: `You've used all ${FREE_CHECK_LIMIT} free checks. Upgrade to continue.`,
+    };
+    return NextResponse.json(response, { status: 402 });
+  }
 
   if (!url || typeof url !== "string" || url.trim().length === 0) {
     return NextResponse.json(
@@ -162,7 +192,16 @@ export async function POST(req: NextRequest) {
     };
 
     console.log(`━━━ VerifAI check complete - ${result.processingTimeMs}ms | verdict: ${result.overallVerdict} | credibility: ${result.credibilityScore} ━━━\n`);
-    const response: CheckResponse = { success: true, result };
+
+    // Increment the check counter after a successful analysis (skip for admins/paid)
+    const newCount = isAdmin || paid ? count : await incrementCheckCount(email);
+    const checksRemaining = isAdmin || paid ? null : Math.max(0, FREE_CHECK_LIMIT - newCount);
+
+    const response: CheckResponse = {
+      success: true,
+      result,
+      ...(checksRemaining !== null && { checksRemaining }),
+    };
     return NextResponse.json(response);
   } catch (err) {
     console.error("Analysis stage error:", err);
