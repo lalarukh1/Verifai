@@ -49,7 +49,7 @@ export default function ScoreRing({ value, label, color }: ScoreRingProps) {
             cy="44"
             r={radius}
             fill="none"
-            stroke="#1a1a30"
+            stroke="rgba(255,255,255,0.08)"
             strokeWidth="8"
           />
           {/* Progress */}
@@ -72,7 +72,7 @@ export default function ScoreRing({ value, label, color }: ScoreRingProps) {
           </span>
         </div>
       </div>
-      <span className="text-[#64748b] font-mono text-xs uppercase tracking-wider">
+      <span className="font-mono text-xs uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.3)" }}>
         {label}
       </span>
     </div>

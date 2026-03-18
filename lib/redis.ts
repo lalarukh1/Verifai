@@ -9,6 +9,9 @@ export const FREE_CHECK_LIMIT = Number(
   process.env.NEXT_PUBLIC_FREE_CHECK_LIMIT ?? 10
 );
 
+// Free mode: email-only gate, unlimited checks. Flip to "paid" in .env to enable paywall.
+export const IS_FREE_MODE = process.env.NEXT_PUBLIC_MODE !== "paid";
+
 function key(email: string) {
   return email.toLowerCase().trim();
 }

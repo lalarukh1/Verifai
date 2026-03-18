@@ -5,7 +5,7 @@ import { transcribeFromUrl } from "@/lib/deepgram";
 import { analyseContent } from "@/lib/claude";
 import { enrichClaimsWithSearch } from "@/lib/search";
 import { AnalysisResult, CheckResponse } from "@/lib/types";
-import { getCheckCount, incrementCheckCount, isPaidUser, FREE_CHECK_LIMIT } from "@/lib/redis";
+import { getCheckCount, incrementCheckCount, isPaidUser, FREE_CHECK_LIMIT, IS_FREE_MODE } from "@/lib/redis";
 
 export const maxDuration = 60;
 
@@ -70,11 +70,11 @@ export async function POST(req: NextRequest) {
     .filter(Boolean);
   const isAdmin = adminEmails.includes(email.toLowerCase().trim());
 
-  const [count, paid] = isAdmin
+  const [count, paid] = isAdmin || IS_FREE_MODE
     ? [0, true]
     : await Promise.all([getCheckCount(email), isPaidUser(email)]);
 
-  if (!isAdmin && count >= FREE_CHECK_LIMIT && !paid) {
+  if (!IS_FREE_MODE && !isAdmin && count >= FREE_CHECK_LIMIT && !paid) {
     const response: CheckResponse = {
       success: false,
       paywalled: true,
@@ -193,9 +193,9 @@ export async function POST(req: NextRequest) {
 
     console.log(`━━━ VerifAI check complete - ${result.processingTimeMs}ms | verdict: ${result.overallVerdict} | credibility: ${result.credibilityScore} ━━━\n`);
 
-    // Increment the check counter after a successful analysis (skip for admins/paid)
-    const newCount = isAdmin || paid ? count : await incrementCheckCount(email);
-    const checksRemaining = isAdmin || paid ? null : Math.max(0, FREE_CHECK_LIMIT - newCount);
+    // Increment the check counter after a successful analysis (skip in free mode, for admins, or paid users)
+    const newCount = IS_FREE_MODE || isAdmin || paid ? count : await incrementCheckCount(email);
+    const checksRemaining = IS_FREE_MODE || isAdmin || paid ? null : Math.max(0, FREE_CHECK_LIMIT - newCount);
 
     const response: CheckResponse = {
       success: true,
