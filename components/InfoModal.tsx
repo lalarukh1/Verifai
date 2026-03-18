@@ -31,12 +31,12 @@ const sections: Section[] = [
     ? {
         icon: "✨",
         title: "Free to use",
-        body: "VerifAI is currently free to use — just add your email to get started. We only use it to track how many people are using the app and send occasional updates. We never spam or share your data.",
+        body: "VerifAI is currently free to use. Just add your email to get started. We only use it to track how many people are using the app and send occasional updates. We never spam or share your data.",
       }
     : {
         icon: "✨",
         title: "Free & paid",
-        body: `Your first ${FREE_LIMIT} checks are completely free — no credit card required. After that, VerifAI is £4.99/month for unlimited checks. Cancel anytime.`,
+        body: `Your first ${FREE_LIMIT} checks are completely free, no credit card required. After that, VerifAI is £4.99/month for unlimited checks. Cancel anytime.`,
       },
 ];
 
@@ -69,7 +69,7 @@ export default function InfoModal({ onClose }: InfoModalProps) {
         <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
           <div>
             <h2 className="text-lg font-bold" style={{ color: "#F0F9FF" }}>How VerifAI works</h2>
-            <p className="text-sm mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>The AI, the sources, the score — explained.</p>
+            <p className="text-sm mt-0.5" style={{ color: "rgba(255,255,255,0.6)" }}>The AI, the sources, the score, explained.</p>
           </div>
           <button
             onClick={onClose}
@@ -102,7 +102,7 @@ export default function InfoModal({ onClose }: InfoModalProps) {
             className="px-4 py-3.5 rounded-2xl text-center"
             style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
           >
-            <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+            <p className="text-xs" style={{ color: "rgba(255,255,255,0.55)" }}>
               VerifAI does not store your searches or share your data with third parties.
             </p>
           </div>

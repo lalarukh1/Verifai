@@ -277,7 +277,7 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
                       {ec.accountHandle ? `@${ec.accountHandle}` : "Unknown account"}
                     </span>
                     {ec.accountFollowers != null && (
-                      <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.35)" }}>
+                      <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.6)" }}>
                         {formatFollowers(ec.accountFollowers)} followers
                       </span>
                     )}
@@ -304,7 +304,7 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
                     {sourceLabel[ec.source] ?? ec.source}
                   </span>
                   {timestamp && (
-                    <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.3)" }}>{timestamp}</span>
+                    <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.55)" }}>{timestamp}</span>
                   )}
                 </div>
               </div>
@@ -350,7 +350,7 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
           >
             <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: cfg.color, boxShadow: `0 0 8px ${cfg.color}` }} />
             <span className="text-sm font-bold tracking-wide" style={{ color: cfg.color }}>{cfg.label}</span>
-            <span className="text-xs ml-auto font-mono" style={{ color: cfg.textMuted }}>Overall verdict</span>
+            <span className="text-xs ml-auto font-mono" style={{ color: cfg.color, opacity: 0.75 }}>Overall verdict</span>
           </div>
 
           {/* Body */}
@@ -369,7 +369,7 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
           >
             <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: "linear-gradient(135deg, #2DD4BF, #60A5FA)" }} />
             <span className="text-sm font-semibold" style={{ color: "rgba(255,255,255,0.8)" }}>Credibility Score</span>
-            <span className="text-xs ml-auto font-mono" style={{ color: "rgba(255,255,255,0.25)" }}>out of 100</span>
+            <span className="text-xs ml-auto font-mono" style={{ color: "rgba(255,255,255,0.55)" }}>out of 100</span>
           </div>
           <div className="p-5">
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
@@ -384,15 +384,15 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
                       >
                         {f.active ? (f.positive ? "✓" : "✗") : "–"}
                       </span>
-                      <span className="text-sm" style={{ color: f.active ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.2)" }}>
+                      <span className="text-sm" style={{ color: f.active ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.5)" }}>
                         {f.label}
                       </span>
                     </div>
                     <span
                       className="text-sm font-semibold font-mono flex-shrink-0"
-                      style={{ color: f.active ? (f.positive ? "#34D399" : "#F87171") : "rgba(255,255,255,0.15)" }}
+                      style={{ color: f.active ? (f.positive ? "#34D399" : "#F87171") : "rgba(255,255,255,0.4)" }}
                     >
-                      {f.active ? f.delta : "—"}
+                      {f.active ? f.delta : "-"}
                     </span>
                   </div>
                 ))}
@@ -418,7 +418,7 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
                   </span>
                 </div>
               </div>
-              <span className="text-xs font-mono flex-shrink-0 mt-0.5" style={{ color: "rgba(255,255,255,0.2)" }}>
+              <span className="text-xs font-mono flex-shrink-0 mt-0.5" style={{ color: "rgba(255,255,255,0.5)" }}>
                 tap to expand
               </span>
             </div>
@@ -450,7 +450,7 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
                 </svg>
                 <span className="text-sm font-semibold" style={{ color: "rgba(255,255,255,0.75)" }}>Sources</span>
               </div>
-              <p className="text-xs mt-1 font-mono" style={{ color: "rgba(255,255,255,0.3)" }}>
+              <p className="text-xs mt-1 font-mono" style={{ color: "rgba(255,255,255,0.55)" }}>
                 Read the articles the AI used to reach this verdict
               </p>
             </div>
@@ -494,8 +494,8 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
                       </svg>
                     </div>
                     <div className="space-y-0.5">
-                      {domain && <p className="text-xs font-mono truncate" style={{ color: "rgba(45,212,191,0.5)" }}>{domain}</p>}
-                      {source.date && <p className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.2)" }}>{source.date}</p>}
+                      {domain && <p className="text-xs font-mono truncate" style={{ color: "rgba(45,212,191,0.85)" }}>{domain}</p>}
+                      {source.date && <p className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.5)" }}>{source.date}</p>}
                     </div>
                   </a>
                 );
@@ -508,11 +508,11 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
         <div className="flex flex-col items-center gap-3 pt-2 pb-6">
           <div className="w-16 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)" }} />
           <div className="flex items-center gap-2">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "rgba(255,255,255,0.2)" }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "rgba(255,255,255,0.45)" }}>
               <circle cx="12" cy="12" r="10" />
               <polyline points="12 6 12 12 16 14" />
             </svg>
-            <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.2)" }}>
+            <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.45)" }}>
               Checked {checkedAt.current.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })} at {checkedAt.current.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
             </span>
           </div>

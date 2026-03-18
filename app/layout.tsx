@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   title: "VerifAI: Fact check social media instantly",
   description:
     "Paste any Instagram or TikTok URL and get an instant AI-powered fact-check report.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

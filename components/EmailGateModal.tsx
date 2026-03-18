@@ -71,7 +71,7 @@ export default function EmailGateModal({ onSubmit }: Props) {
                 VerifAI is free to use
               </h2>
               <p className="text-sm text-center mb-8 leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
-                Just add your email to get started. We&apos;ll never spam you — we only use it to
+                Just add your email to get started. We&apos;ll never spam you, we only use it to
                 track how many people are using VerifAI and to send the occasional product update.
               </p>
             </>

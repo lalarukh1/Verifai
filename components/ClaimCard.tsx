@@ -59,7 +59,7 @@ export default function ClaimCard({ claim }: ClaimCardProps) {
           </span>
           <svg
             className="w-4 h-4 flex-shrink-0 transition-transform duration-200"
-            style={{ color: "rgba(255,255,255,0.3)", transform: expanded ? "rotate(180deg)" : "rotate(0deg)" }}
+            style={{ color: "rgba(255,255,255,0.55)", transform: expanded ? "rotate(180deg)" : "rotate(0deg)" }}
             fill="none" viewBox="0 0 24 24" stroke="currentColor"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -73,7 +73,7 @@ export default function ClaimCard({ claim }: ClaimCardProps) {
             {claim.text}
           </p>
           {!expanded && domains.length > 0 && (
-            <p className="text-xs mt-1.5 font-mono" style={{ color: "rgba(255,255,255,0.25)" }}>
+            <p className="text-xs mt-1.5 font-mono" style={{ color: "rgba(255,255,255,0.55)" }}>
               {domains.join(" · ")}
             </p>
           )}
@@ -86,7 +86,7 @@ export default function ClaimCard({ claim }: ClaimCardProps) {
           {/* Explanation */}
           <div className="px-4 pt-4 pb-4">
             <p className="text-xs font-mono font-semibold uppercase tracking-widest mb-2"
-              style={{ color: "rgba(255,255,255,0.3)" }}>Explanation</p>
+              style={{ color: "rgba(255,255,255,0.55)" }}>Explanation</p>
             <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>
               {claim.explanation}
             </p>
@@ -96,10 +96,10 @@ export default function ClaimCard({ claim }: ClaimCardProps) {
           <div className="px-4 py-4 border-t" style={{ borderColor: "rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.02)" }}>
             <div className="flex items-start justify-between gap-3 mb-3">
               <div>
-                <p className="text-xs font-mono font-semibold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.3)" }}>
+                <p className="text-xs font-mono font-semibold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.55)" }}>
                   AI confidence
                 </p>
-                <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.2)" }}>
+                <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.5)" }}>
                   How certain the AI is this claim is {cfg.label.toLowerCase()}
                 </p>
               </div>
@@ -123,7 +123,7 @@ export default function ClaimCard({ claim }: ClaimCardProps) {
           {claim.sources && claim.sources.some((s) => isValidUrl(s.url)) && (
             <div className="px-4 py-4 border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
               <p className="text-xs font-mono font-semibold uppercase tracking-widest mb-3"
-                style={{ color: "rgba(255,255,255,0.3)" }}>Sources</p>
+                style={{ color: "rgba(255,255,255,0.55)" }}>Sources</p>
               <div className="space-y-2">
                 {claim.sources.filter((s) => isValidUrl(s.url)).map((source, idx) => (
                   <a
@@ -142,7 +142,7 @@ export default function ClaimCard({ claim }: ClaimCardProps) {
                     <span className="flex flex-col min-w-0">
                       <span className="text-sm truncate" style={{ color: "#2DD4BF" }}>{source.name}</span>
                       {source.date && (
-                        <span className="text-xs mt-0.5 font-mono" style={{ color: "rgba(255,255,255,0.25)" }}>
+                        <span className="text-xs mt-0.5 font-mono" style={{ color: "rgba(255,255,255,0.55)" }}>
                           {source.date}
                         </span>
                       )}

@@ -193,7 +193,7 @@ export default function Home() {
                 <p className="text-xl font-semibold text-white/90 mb-2">
                   Fact-check anything. <span className="gradient-text">Instantly.</span>
                 </p>
-                <p className="text-sm text-white/40 leading-relaxed max-w-sm mx-auto">
+                <p className="text-sm text-white/60 leading-relaxed max-w-sm mx-auto">
                   Verify news and information in Instagram Reels<br className="hidden sm:block" /> and TikToks before you share.
                 </p>
                 {/* Decorative dash — offset right */}

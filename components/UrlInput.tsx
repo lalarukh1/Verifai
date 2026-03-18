@@ -72,7 +72,7 @@ function ExampleCard({ example, onClick, tilt }: { example: Example; onClick: ()
           <span style={{ color: isIG ? "#F472B6" : "#22D3EE" }}>
             {isIG ? <InstagramIcon className="w-3.5 h-3.5" /> : <TikTokIcon className="w-3.5 h-3.5" />}
           </span>
-          <span className="text-xs font-mono truncate" style={{ color: "rgba(255,255,255,0.4)" }}>{handle}</span>
+          <span className="text-xs font-mono truncate" style={{ color: "rgba(255,255,255,0.6)" }}>{handle}</span>
         </div>
 
         {/* Excerpt */}
@@ -86,7 +86,7 @@ function ExampleCard({ example, onClick, tilt }: { example: Example; onClick: ()
           >
             {vs.label}
           </span>
-          <span className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>preview →</span>
+          <span className="text-xs" style={{ color: "rgba(255,255,255,0.55)" }}>preview →</span>
         </div>
       </div>
     </button>
@@ -186,7 +186,7 @@ export default function UrlInput({ onSubmit, isLoading, error, onExample, onInfo
             : "linear-gradient(135deg, #2DD4BF 0%, #22D3EE 40%, #60A5FA 100%)",
           backgroundSize: "200% auto",
           animation: !isLoading && url.trim() ? "shimmer 3s linear infinite" : "none",
-          color: isLoading || !url.trim() ? "rgba(255,255,255,0.3)" : "#060E1A",
+          color: isLoading || !url.trim() ? "rgba(255,255,255,0.55)" : "#060E1A",
           cursor: isLoading || !url.trim() ? "not-allowed" : "pointer",
           boxShadow: !isLoading && url.trim() ? "0 8px 32px rgba(45,212,191,0.3)" : "none",
         }}
@@ -211,7 +211,7 @@ export default function UrlInput({ onSubmit, isLoading, error, onExample, onInfo
           {/* Divider */}
           <div className="flex items-center gap-3 mb-5">
             <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.08))" }} />
-            <p className="text-xs font-mono whitespace-nowrap" style={{ color: "rgba(255,255,255,0.3)" }}>
+            <p className="text-xs font-mono whitespace-nowrap" style={{ color: "rgba(255,255,255,0.55)" }}>
               try an example
             </p>
             <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg, rgba(255,255,255,0.08), transparent)" }} />
@@ -240,12 +240,12 @@ export default function UrlInput({ onSubmit, isLoading, error, onExample, onInfo
           style={{
             background: "rgba(255,255,255,0.03)",
             border: "1px solid rgba(255,255,255,0.08)",
-            color: "rgba(255,255,255,0.4)",
+            color: "rgba(255,255,255,0.6)",
           }}
         >
           <span>ⓘ</span>
           <span>How VerifAI works</span>
-          <span style={{ color: "rgba(255,255,255,0.15)" }}>→</span>
+          <span style={{ color: "rgba(255,255,255,0.3)" }}>→</span>
         </button>
       )}
     </form>
