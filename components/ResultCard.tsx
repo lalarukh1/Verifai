@@ -302,7 +302,7 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
 
         {/* ── Summary snapshot card ───────────────────────── */}
         <div
-          className="rounded-3xl overflow-hidden"
+          className="rounded-[14px] overflow-hidden"
           style={{
             background: "linear-gradient(160deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
             border: "1px solid rgba(255,255,255,0.09)",
@@ -524,9 +524,9 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
             <span className="text-xs ml-auto font-mono" style={{ color: "rgba(255,255,255,0.55)" }}>starts at 50 / out of 100</span>
           </div>
           <div className="p-5">
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+            <div className="flex flex-col sm:flex-row items-center sm:items-center gap-5">
               <ScoreRing value={result.credibilityScore} label="Credibility" color="#2DD4BF" />
-              <div className="flex-1 space-y-3.5 w-full">
+              <div className="flex-1 w-full flex flex-col gap-3.5 justify-center">
                 {scoreFactors.map((f) => (
                   <div key={f.label} className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2.5">

@@ -33,3 +33,18 @@ export async function isPaidUser(email: string): Promise<boolean> {
 export async function markAsPaid(email: string): Promise<void> {
   await redis.set(`verifai:paid:${key(email)}`, "true");
 }
+
+// ── Result cache (keyed by URL, TTL 7 days) ───────────────────────────────
+const CACHE_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days
+
+function cacheKey(url: string) {
+  return `verifai:result:${url.toLowerCase().trim()}`;
+}
+
+export async function getCachedResult(url: string) {
+  return redis.get<import("./types").AnalysisResult>(cacheKey(url));
+}
+
+export async function setCachedResult(url: string, result: import("./types").AnalysisResult) {
+  await redis.set(cacheKey(url), result, { ex: CACHE_TTL_SECONDS });
+}

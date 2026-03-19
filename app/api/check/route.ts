@@ -5,7 +5,7 @@ import { transcribeFromUrl } from "@/lib/deepgram";
 import { extractClaimsAndGenre, assignVerdicts } from "@/lib/claude";
 import { searchClaimsForEvidence } from "@/lib/search";
 import { AnalysisResult, Claim, CheckResponse } from "@/lib/types";
-import { getCheckCount, incrementCheckCount, isPaidUser, FREE_CHECK_LIMIT, IS_FREE_MODE } from "@/lib/redis";
+import { getCheckCount, incrementCheckCount, isPaidUser, FREE_CHECK_LIMIT, IS_FREE_MODE, getCachedResult, setCachedResult } from "@/lib/redis";
 
 export const maxDuration = 60;
 
@@ -100,6 +100,20 @@ export async function POST(req: NextRequest) {
       },
       { status: 400 }
     );
+  }
+
+  // ── CACHE CHECK ──────────────────────────────────────────────
+  const cached = await getCachedResult(url.trim());
+  if (cached) {
+    console.log(`✅ [Cache] Hit for: ${url.trim().slice(0, 80)}`);
+    const newCount = IS_FREE_MODE || isAdmin || paid ? count : await incrementCheckCount(email);
+    const checksRemaining = IS_FREE_MODE || isAdmin || paid ? null : Math.max(0, FREE_CHECK_LIMIT - newCount);
+    const response: CheckResponse = {
+      success: true,
+      result: cached,
+      ...(checksRemaining !== null && { checksRemaining }),
+    };
+    return NextResponse.json(response);
   }
 
   // ── EXTRACTION ──────────────────────────────────────────────
@@ -234,6 +248,9 @@ export async function POST(req: NextRequest) {
     };
 
     console.log(`━━━ VerifAI check complete - ${result.processingTimeMs}ms | verdict: ${result.overallVerdict} | credibility: ${result.credibilityScore} ━━━\n`);
+
+    // Cache result so repeat checks of the same URL are instant and consistent
+    await setCachedResult(url.trim(), result);
 
     // Increment the check counter after a successful analysis (skip in free mode, for admins, or paid users)
     const newCount = IS_FREE_MODE || isAdmin || paid ? count : await incrementCheckCount(email);
