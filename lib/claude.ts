@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { Claim, ExtractedContent, OverallVerdict } from "./types";
+import { Claim, ClaimWithEvidence, ExtractedContent, OverallVerdict } from "./types";
+import { Genre } from "./genres";
 
 const SYSTEM_PROMPT = `You are VerifAI, a fact-checker with a conscience. You have the rigour of an investigative journalist and the heart of someone who deeply cares about humanity, truth, and the dignity of every human being.
 
@@ -29,6 +30,16 @@ CRITICAL RULES:
 
 Analyse the text for factual claims, meaning statements that can be checked against reality, documented evidence, or public record. Opinions, grief, and calls for justice are not factual claims and should not be listed as claims at all.`;
 
+export interface RawClaim {
+  text: string;
+  category: string;
+}
+
+export interface ExtractionResult {
+  genre: Genre;
+  claims: RawClaim[];
+}
+
 export interface ClaudeAnalysisResult {
   overallVerdict: OverallVerdict;
   verdictReason: string;
@@ -41,44 +52,142 @@ const FALLBACK_RESULT: ClaudeAnalysisResult = {
   claims: [],
 };
 
-export async function analyseContent(
+/**
+ * Pass 1 - Classify the content genre and extract raw factual claims.
+ * No verdicts are assigned here - this is intentionally lightweight.
+ */
+export async function extractClaimsAndGenre(
   content: ExtractedContent
-): Promise<ClaudeAnalysisResult> {
-  const userPrompt = `Analyse this social media post with both factual rigour and human empathy.
+): Promise<ExtractionResult> {
+  const client = new Anthropic();
+  console.log("🔄 [Claude/P1] Extracting claims and detecting genre...");
+
+  const userPrompt = `Analyse this social media post. Do two things:
+
+1. Identify the single best-matching content genre from this list:
+   ai_technology, technology, health_medical, politics_governance, finance_economics,
+   science_environment, humanitarian_conflict, religion, sports, entertainment_culture, general
+
+   Genre definitions:
+   - ai_technology: artificial intelligence, machine learning, AI tools, AI adoption stats
+   - technology: general tech (smartphones, software, apps, companies, internet, social media)
+   - health_medical: disease, medicine, vaccines, nutrition, mental health, public health
+   - politics_governance: elections, government, policy, law, international relations
+   - finance_economics: markets, stocks, crypto, economy, business, trade
+   - science_environment: climate, space, biology, chemistry, physics, research studies
+   - humanitarian_conflict: wars, refugees, humanitarian crises, human rights violations
+   - religion: religious claims, scripture, faith, theology
+   - sports: sports results, records, athletes, competitions
+   - entertainment_culture: movies, music, celebrities, TV, culture
+   - general: anything that does not clearly fit the above
+
+2. Extract all specific verifiable factual claims (statements that can be checked against reality).
+   Do NOT include opinions, emotions, grief, calls for justice, or rhetorical questions.
 
 Platform: ${content.platform}
 Account: @${content.accountHandle ?? "unknown"} (${content.accountFollowers != null ? content.accountFollowers.toLocaleString() + " followers" : "unknown followers"})
 Post text: ${content.text}
 
-Before analysing, ask yourself:
-1. Is this content trying to deceive, or is it a person expressing grief, outrage, or a call for humanity?
-2. Does this content make specific verifiable claims, or is it an emotional appeal?
-3. If it is about an ongoing humanitarian crisis, conflict, or oppression, what does credible, documented evidence say about the broader context?
-
-Return a JSON object with exactly this structure:
+Return ONLY this JSON:
 {
-  "overallVerdict": "TRUSTWORTHY" | "MISLEADING" | "FALSE" | "UNVERIFIED",
-  "verdictReason": "One warm, honest, human sentence explaining your verdict. If the content is a humanitarian appeal, acknowledge the human pain behind it. Never be cold or dismissive.",
+  "genre": "one of the genres listed above",
   "claims": [
-    {
-      "text": "The specific verifiable claim as stated",
-      "verdict": "TRUE" | "FALSE" | "MISLEADING" | "UNVERIFIED" | "NO_EVIDENCE",
-      "confidence": 0.0 to 1.0,
-      "explanation": "2-3 sentences explaining your verdict with compassion and context. Cite the documented reality where relevant. For religious references, cite the original scripture.",
-      "category": "health" | "science" | "politics" | "finance" | "humanitarian" | "religion" | "general",
-      "sources": []
-    }
+    { "text": "exact verifiable claim as stated in the post", "category": "health | science | politics | finance | humanitarian | religion | general | ai_technology | technology | sports | entertainment" }
   ]
 }
 
-Rules for claims:
-- Only extract specific verifiable factual claims (e.g. death tolls, dates, statistics, religious quotes, scientific assertions).
-- Do NOT extract opinions, emotions, grief, calls for justice, or rhetorical questions as claims. These are human expressions, not facts to debunk.
-- Extract between 0 and 5 claims. If the post is purely emotional or a call for humanity with no specific factual assertions, return an empty claims array.
-- Always return "sources": [] for every claim. Sources are fetched separately from a live news index. Do not generate any URLs yourself.`;
+Extract 0 to 5 claims. If the post is purely emotional with no verifiable facts, return an empty claims array.`;
 
+  try {
+    const message = await client.messages.create({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1000,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: "user", content: userPrompt }],
+    });
+
+    const rawText =
+      message.content[0].type === "text" ? message.content[0].text : "";
+    const responseText = rawText
+      .replace(/^```(?:json)?\s*/i, "")
+      .replace(/\s*```\s*$/, "")
+      .trim();
+
+    const parsed = JSON.parse(responseText) as ExtractionResult;
+    console.log(`✅ [Claude/P1] Genre: ${parsed.genre}, Claims: ${parsed.claims?.length ?? 0}`);
+    return {
+      genre: parsed.genre ?? "general",
+      claims: Array.isArray(parsed.claims) ? parsed.claims : [],
+    };
+  } catch (err) {
+    console.error("❌ [Claude/P1] Failed:", err);
+    return { genre: "general", claims: [] };
+  }
+}
+
+/**
+ * Pass 2 - Assign verdicts to each claim using the real search evidence found.
+ * Claude receives the evidence snippets and can now make informed, confident verdicts.
+ */
+export async function assignVerdicts(
+  content: ExtractedContent,
+  claimsWithEvidence: ClaimWithEvidence[]
+): Promise<ClaudeAnalysisResult> {
   const client = new Anthropic();
-  console.log("🔄 [Claude] Sending to claude-sonnet-4-6 for analysis...");
+  console.log("🔄 [Claude/P2] Assigning verdicts with evidence...");
+
+  const evidenceContext =
+    claimsWithEvidence.length > 0
+      ? claimsWithEvidence
+          .map((c, i) => {
+            const snippets =
+              c.evidence.length > 0
+                ? c.evidence
+                    .slice(0, 6)
+                    .map((e) => `    - ${e.name}${e.date ? ` (${e.date})` : ""}: "${e.snippet}"`)
+                    .join("\n")
+                : "    - No evidence found in search";
+            return `Claim ${i + 1}: "${c.text}"\nEvidence:\n${snippets}`;
+          })
+          .join("\n\n")
+      : "No specific factual claims were extracted from this post.";
+
+  const userPrompt = `You are assigning verdicts to claims extracted from a social media post. You have real search evidence snippets to inform your verdicts - use them.
+
+Platform: ${content.platform}
+Account: @${content.accountHandle ?? "unknown"} (${content.accountFollowers != null ? content.accountFollowers.toLocaleString() + " followers" : "unknown followers"})
+Post text: ${content.text}
+
+CLAIMS AND SEARCH EVIDENCE:
+${evidenceContext}
+
+Instructions for verdicts:
+- CRITICAL: When multiple evidence sources discuss the same statistic, ranking, or fact in a consistent direction, you MUST mark it TRUE. Do not demand a single perfect source - corroboration across sources is sufficient proof.
+- For statistics and rankings (e.g. "Country X leads in AI adoption"): if 2 or more snippets point to the same conclusion, even indirectly, mark TRUE.
+- If evidence contradicts the claim, mark it FALSE.
+- If evidence is partial, mixed, or the claim overstates what evidence shows, mark it MISLEADING.
+- Mark UNVERIFIED ONLY when evidence is completely absent AND you cannot verify from your own knowledge with high confidence.
+- Never downgrade a claim to UNVERIFIED simply because evidence snippets are brief or don't quote the exact wording of the claim.
+- Return claims in the EXACT same order and with the EXACT same text as listed above.
+
+For the overall verdict, consider the post as a whole - its tone, purpose, and whether it is trying to inform, deceive, or make a human appeal.
+
+Return ONLY this JSON:
+{
+  "overallVerdict": "TRUSTWORTHY" | "MISLEADING" | "FALSE" | "UNVERIFIED",
+  "verdictReason": "One warm, honest sentence explaining the overall verdict. Acknowledge human pain where relevant.",
+  "claims": [
+    {
+      "text": "exact claim text as provided above",
+      "verdict": "TRUE" | "FALSE" | "MISLEADING" | "UNVERIFIED" | "NO_EVIDENCE",
+      "confidence": 0.0 to 1.0,
+      "explanation": "2-3 sentences explaining your verdict, referencing the evidence found where relevant.",
+      "category": "category from input",
+      "sources": []
+    }
+  ]
+}`;
+
   try {
     const message = await client.messages.create({
       model: "claude-sonnet-4-6",
@@ -89,30 +198,34 @@ Rules for claims:
 
     const rawText =
       message.content[0].type === "text" ? message.content[0].text : "";
-
-    // Strip markdown code fences that Claude sometimes adds despite instructions
     const responseText = rawText
       .replace(/^```(?:json)?\s*/i, "")
       .replace(/\s*```\s*$/, "")
       .trim();
 
-    try {
-      const parsed = JSON.parse(responseText) as ClaudeAnalysisResult;
-      console.log(`✅ [Claude] Analysis complete - verdict: ${parsed.overallVerdict}, claims: ${parsed.claims?.length ?? 0}`);
-      return {
-        overallVerdict: parsed.overallVerdict ?? "UNVERIFIED",
-        verdictReason: parsed.verdictReason ?? "No reason provided.",
-        // Strip any sources Claude may have generated - sources come from Serper only
+    const parsed = JSON.parse(responseText) as ClaudeAnalysisResult;
+    console.log(`✅ [Claude/P2] Verdict: ${parsed.overallVerdict}, Claims: ${parsed.claims?.length ?? 0}`);
+    return {
+      overallVerdict: parsed.overallVerdict ?? "UNVERIFIED",
+      verdictReason: parsed.verdictReason ?? "No reason provided.",
+      // Strip any sources Claude may have generated - sources come from search only
       claims: Array.isArray(parsed.claims)
         ? parsed.claims.map((c) => ({ ...c, sources: [] }))
         : [],
-      };
-    } catch {
-      console.error("❌ [Claude] JSON parse failed - raw response:", rawText.slice(0, 200));
-      return FALLBACK_RESULT;
-    }
+    };
   } catch (err) {
-    console.error("❌ [Claude] API error:", err);
-    return FALLBACK_RESULT;
+    console.error("❌ [Claude/P2] Failed:", err);
+    // Build a fallback that preserves the claim texts
+    return {
+      ...FALLBACK_RESULT,
+      claims: claimsWithEvidence.map((c) => ({
+        text: c.text,
+        verdict: "UNVERIFIED" as const,
+        confidence: 0,
+        explanation: "Analysis could not be completed.",
+        category: c.category,
+        sources: [],
+      })),
+    };
   }
 }

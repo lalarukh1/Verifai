@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { detectPlatform, extractFromUrl } from "@/lib/apify";
 import { transcribeFromUrl } from "@/lib/deepgram";
-import { analyseContent } from "@/lib/claude";
-import { enrichClaimsWithSearch } from "@/lib/search";
-import { AnalysisResult, CheckResponse } from "@/lib/types";
+import { extractClaimsAndGenre, assignVerdicts } from "@/lib/claude";
+import { searchClaimsForEvidence } from "@/lib/search";
+import { AnalysisResult, Claim, CheckResponse } from "@/lib/types";
 import { getCheckCount, incrementCheckCount, isPaidUser, FREE_CHECK_LIMIT, IS_FREE_MODE } from "@/lib/redis";
 
 export const maxDuration = 60;
@@ -13,15 +13,18 @@ function calculateCredibilityScore(params: {
   accountFollowers?: number;
   overallVerdict: string;
   hasSources: boolean;
+  allClaimsUnverified: boolean;
 }): number {
   let score = 50;
   if ((params.accountFollowers ?? 0) > 100000) score += 20;
   if (
     params.overallVerdict === "FALSE" ||
-    params.overallVerdict === "MISLEADING"
+    params.overallVerdict === "MISLEADING" ||
+    params.overallVerdict === "UNVERIFIED"
   )
     score -= 20;
-  if (params.hasSources) score += 10;
+  if (params.hasSources && !params.allClaimsUnverified) score += 10;
+  if (params.hasSources && params.allClaimsUnverified) score -= 10;
   return Math.max(0, Math.min(100, score));
 }
 
@@ -164,21 +167,62 @@ export async function POST(req: NextRequest) {
 
   // ── ANALYSIS ─────────────────────────────────────────────────
   try {
-    const claudeResult = await analyseContent(content);
+    // Pass 1: classify genre and extract raw claims (no verdicts yet)
+    const { genre, claims: rawClaims } = await extractClaimsAndGenre(content);
 
-    const enrichedClaims = await enrichClaimsWithSearch(claudeResult.claims);
+    // Search: find evidence snippets using genre-specific authority sites
+    const claimsWithEvidence = await searchClaimsForEvidence(rawClaims, genre);
+
+    // Pass 2: assign verdicts informed by the real evidence
+    const claudeResult = await assignVerdicts(content, claimsWithEvidence);
+
+    // Attach sources (with snippets) from search evidence to each verdict
+    const enrichedClaims: Claim[] = claudeResult.claims.map((verdictedClaim, i) => ({
+      ...verdictedClaim,
+      sources: (claimsWithEvidence[i]?.evidence ?? []).map(
+        ({ name, url, date, snippet }) => ({ name, url, date, snippet })
+      ),
+    }));
+
     const hasSources = enrichedClaims.some(
       (c) => c.sources && c.sources.length > 0
     );
+    const allClaimsUnverified =
+      enrichedClaims.length > 0 &&
+      enrichedClaims.every(
+        (c) => c.verdict === "UNVERIFIED" || c.verdict === "NO_EVIDENCE"
+      );
+
+    // Override overall verdict when claim mix contradicts Claude's assessment.
+    // Claude sometimes assigns TRUSTWORTHY even when most claims are unverified.
+    const overallVerdict = (() => {
+      const cv = claudeResult.overallVerdict;
+      if (enrichedClaims.length === 0) return cv;
+
+      const falseOrMisleading = enrichedClaims.filter(
+        (c) => c.verdict === "FALSE" || c.verdict === "MISLEADING"
+      ).length;
+      const unverified = enrichedClaims.filter(
+        (c) => c.verdict === "UNVERIFIED" || c.verdict === "NO_EVIDENCE"
+      ).length;
+      const trueCount = enrichedClaims.filter((c) => c.verdict === "TRUE").length;
+
+      // If Claude says TRUSTWORTHY but most claims are unverified/missing, downgrade
+      if (cv === "TRUSTWORTHY" && unverified > trueCount) return "UNVERIFIED";
+      // If Claude says TRUSTWORTHY but there are false/misleading claims, downgrade
+      if (cv === "TRUSTWORTHY" && falseOrMisleading > 0) return "MISLEADING";
+      return cv;
+    })();
 
     const credibilityScore = calculateCredibilityScore({
       accountFollowers: content.accountFollowers,
-      overallVerdict: claudeResult.overallVerdict,
+      overallVerdict,
       hasSources,
+      allClaimsUnverified,
     });
 
     const result: AnalysisResult = {
-      overallVerdict: claudeResult.overallVerdict,
+      overallVerdict,
       verdictReason: claudeResult.verdictReason,
       claims: enrichedClaims,
       credibilityScore,

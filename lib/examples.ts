@@ -60,7 +60,7 @@ export const EXAMPLES: Example[] = [
           sources: [],
         },
       ],
-      credibilityScore: 40,
+      credibilityScore: 20,
       accountSummary: "@lougpakistan",
       extractedContent: {
         text: "\u201cToday, the entire Islamic world stands behind Ir@n\u201d - Saudi Crown Prince. This statement highlights a significant shift in geopolitical dynamics, emphasizing unity and solidarity within the Islamic world.\n\n#IslamicUnity #Geopolitics #MiddleEast #Iran #SaudiArabia #CrownPrince #GlobalPolitics #IslamicWorld",
@@ -149,7 +149,7 @@ export const EXAMPLES: Example[] = [
           ],
         },
       ],
-      credibilityScore: 80,
+      credibilityScore: 40,
       accountSummary: "@metrouk · 2,700,000 followers",
       extractedContent: {
         text: "An Iranian drone strike has hit the International Financial Centre in Dubai.\n\nAuthorities reported no injuries and said there was only minor damage to the building.\n\nBanks in the city have ordered their staff to not return to the offices, after Iran threatened to hit US and Israeli financial institutions.\n\n#dubai #usa #iran",

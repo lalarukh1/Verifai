@@ -94,6 +94,39 @@ function formatFollowers(n: number): string {
   return n.toLocaleString();
 }
 
+// ── Claim verdict colours (claim-level, not overall) ─────────────────────────
+
+const claimVerdictColor: Record<string, string> = {
+  TRUE:        "#22C55E",
+  FALSE:       "#EF4444",
+  MISLEADING:  "#F97316",
+  UNVERIFIED:  "#EF4444",
+  NO_EVIDENCE: "#EF4444",
+};
+
+/** Human-readable display labels for claim verdicts in the summary card */
+const claimVerdictLabel: Record<string, string> = {
+  TRUE:        "True",
+  FALSE:       "False",
+  MISLEADING:  "Misleading",
+  UNVERIFIED:  "Unverified",
+  NO_EVIDENCE: "No Evidence",
+};
+
+// ── Small verdict badge (used in the summary card) ────────────────────────────
+
+function VerdictBadgeMini({ label, color }: { label: string; color: string }) {
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wide"
+      style={{ background: `${color}22`, color, border: `1px solid ${color}55` }}
+    >
+      <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: color }} />
+      {label}
+    </span>
+  );
+}
+
 // ── Glassmorphism card wrapper ────────────────────────────────────────────────
 
 function GlassCard({ children, className = "", style = {} }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
@@ -160,13 +193,21 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
 
   const hasLargeAccount    = (ec.accountFollowers ?? 0) > 100_000;
   const hasSources         = result.claims.some((c) => c.sources?.some((s) => isValidUrl(s.url)));
-  const hasNegativeVerdict = result.overallVerdict === "FALSE" || result.overallVerdict === "MISLEADING";
+  const hasNegativeVerdict = result.overallVerdict === "FALSE" || result.overallVerdict === "MISLEADING" || result.overallVerdict === "UNVERIFIED";
+  const allClaimsUnverified =
+    result.claims.length > 0 &&
+    result.claims.every((c) => c.verdict === "UNVERIFIED" || c.verdict === "NO_EVIDENCE");
 
   const scoreFactors = [
-    { label: "Large account",    delta: "+20", active: hasLargeAccount,    positive: true  },
-    { label: "Sources found",    delta: "+10", active: hasSources,          positive: true  },
+    { label: "Large account",      delta: "+20", active: hasLargeAccount, positive: true  },
     {
-      label: `${result.overallVerdict === "FALSE" ? "False" : "Misleading"} verdict`,
+      label: hasSources && allClaimsUnverified ? "No claims confirmed" : "Sources found",
+      delta: hasSources && allClaimsUnverified ? "−10" : "+10",
+      active: hasSources,
+      positive: hasSources && !allClaimsUnverified,
+    },
+    {
+      label: result.overallVerdict === "FALSE" ? "False verdict" : result.overallVerdict === "MISLEADING" ? "Misleading verdict" : "Unverified verdict",
       delta: "−20", active: hasNegativeVerdict, positive: false,
     },
   ];
@@ -250,6 +291,96 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
 
       {/* ── Capturable content ─────────────────────────────── */}
       <div ref={contentRef} className="space-y-3" style={{ background: "#060E1A", padding: "1px", borderRadius: "14px" }}>
+
+        {/* ── Summary snapshot card ───────────────────────── */}
+        <div
+          className="rounded-3xl overflow-hidden"
+          style={{
+            background: "linear-gradient(160deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+            border: "1px solid rgba(255,255,255,0.09)",
+            boxShadow: "0 40px 100px rgba(0,0,0,0.5)",
+          }}
+        >
+          {/* Animated top strip */}
+          <div
+            className="h-[3px] animate-ocean"
+            style={{ background: "linear-gradient(90deg, #2DD4BF, #22D3EE, #60A5FA, #A78BFA, #2DD4BF)" }}
+          />
+          <div className="p-7">
+            {/* Account row */}
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-9 h-9 rounded-full flex-shrink-0" style={{ background: "linear-gradient(135deg, #F97316, #EC4899)" }} />
+              <div>
+                <p className="text-sm font-bold" style={{ color: "#F0F9FF" }}>
+                  {ec.accountHandle ? `@${ec.accountHandle}` : "Unknown account"}
+                </p>
+                {ec.accountFollowers != null && (
+                  <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
+                    {formatFollowers(ec.accountFollowers)} followers
+                  </p>
+                )}
+              </div>
+              <div className="ml-auto">
+                <VerdictBadgeMini label={cfg.label.toUpperCase()} color={cfg.color} />
+              </div>
+            </div>
+
+            {/* Credibility score bar */}
+            <div className="mb-5">
+              <div className="flex justify-between mb-1">
+                <span className="text-xs" style={{ color: "rgba(255,255,255,0.55)" }}>Credibility score</span>
+                <span className="text-sm font-black" style={{ color: cfg.color }}>{result.credibilityScore} / 100</span>
+              </div>
+              <div className="h-2 rounded-full" style={{ background: "rgba(255,255,255,0.08)" }}>
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${result.credibilityScore}%`,
+                    background:
+                      result.credibilityScore > 65
+                        ? "linear-gradient(90deg, #34D399, #22C55E)"
+                        : result.credibilityScore > 35
+                        ? "linear-gradient(90deg, #FBBF24, #F97316)"
+                        : "linear-gradient(90deg, #F97316, #EC4899)",
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Claims list */}
+            {result.claims.length > 0 && (
+              <div className="space-y-3">
+                {result.claims.slice(0, 5).map((claim, idx) => {
+                  const claimColor = claimVerdictColor[claim.verdict] ?? "#94A3B8";
+                  return (
+                    <div
+                      key={idx}
+                      className="flex items-start gap-3 p-3.5 rounded-2xl"
+                      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+                    >
+                      <div className="mt-[7px] w-2 h-2 rounded-full shrink-0" style={{ background: claimColor }} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs leading-relaxed mb-1.5" style={{ color: "rgba(255,255,255,0.75)" }}>
+                          {clean(claim.text)}
+                        </p>
+                        <VerdictBadgeMini label={claimVerdictLabel[claim.verdict] ?? claim.verdict} color={claimColor} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Footer */}
+            <p className="text-xs text-center mt-5" style={{ color: "rgba(255,255,255,0.35)" }}>
+              {result.claims.some((c) => c.sources?.length > 0)
+                ? `${result.claims.reduce((acc, c) => acc + (c.sources?.length ?? 0), 0)} sources linked across ${result.claims.length} claim${result.claims.length !== 1 ? "s" : ""}`
+                : result.claims.length > 0
+                ? `${result.claims.length} claim${result.claims.length !== 1 ? "s" : ""} analysed`
+                : "Verified by VerifAI"}
+            </p>
+          </div>
+        </div>
 
         {/* ── Post card ───────────────────────────────────── */}
         <GlassCard>
@@ -369,7 +500,7 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
           >
             <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: "linear-gradient(135deg, #2DD4BF, #60A5FA)" }} />
             <span className="text-sm font-semibold" style={{ color: "rgba(255,255,255,0.8)" }}>Credibility Score</span>
-            <span className="text-xs ml-auto font-mono" style={{ color: "rgba(255,255,255,0.55)" }}>out of 100</span>
+            <span className="text-xs ml-auto font-mono" style={{ color: "rgba(255,255,255,0.55)" }}>starts at 50 / out of 100</span>
           </div>
           <div className="p-5">
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
@@ -382,7 +513,7 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
                         className="text-sm w-4 text-center flex-shrink-0 font-semibold"
                         style={{ color: f.active ? (f.positive ? "#34D399" : "#F87171") : "rgba(255,255,255,0.15)" }}
                       >
-                        {f.active ? (f.positive ? "✓" : "✗") : "–"}
+                        {f.active ? "✓" : "–"}
                       </span>
                       <span className="text-sm" style={{ color: f.active ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.5)" }}>
                         {f.label}
