@@ -166,6 +166,21 @@ export default function Home() {
           {/* ── Hero (input/loading only) ──────────────── */}
           {stage !== "result" && (
             <div className="text-center mb-12 animate-fade-up">
+              {/* Logo mark */}
+              <div className="flex justify-center mb-5">
+                <svg width="48" height="48" viewBox="0 0 96 96" fill="none">
+                  <defs>
+                    <linearGradient id="appLogo" x1="0" y1="0" x2="96" y2="96" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stopColor="#2DD4BF" />
+                      <stop offset="55%" stopColor="#22D3EE" />
+                      <stop offset="100%" stopColor="#60A5FA" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M22 0 L74 0 Q96 0 96 22 L96 74 Q96 96 74 96 L22 96 Q0 96 0 74 L0 22 Q0 0 22 0 Z" fill="url(#appLogo)" />
+                  <path d="M20 52 C23 52 30 61 36 67 C42 73 68 18 96 0" stroke="white" strokeWidth="8.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                </svg>
+              </div>
+
               {/* Badge */}
               <div className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full"
                 style={{
