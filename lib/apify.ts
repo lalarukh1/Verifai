@@ -18,13 +18,19 @@ interface ApifyInstagramPost {
   type?: string;
   videoPlayCount?: number;
   ownerFollowersCount?: number;
+  followersCount?: number;
+  owner?: { followersCount?: number; username?: string };
 }
+
 
 interface ApifyTikTokPost {
   text?: string;
   authorMeta?: {
     name?: string;
     fans?: number;
+    fans_count?: number;
+    followers?: number;
+    followerCount?: number;
   };
   diggCount?: number;
   videoUrl?: string;
@@ -101,9 +107,10 @@ export async function extractFromUrl(url: string): Promise<{
 
       const post = results[0];
       const caption = post.caption ?? "";
-      const handle = post.ownerUsername ?? post.ownerFullName ?? "unknown";
+      const handle = post.ownerUsername ?? post.ownerFullName ?? post.owner?.username ?? "unknown";
       const videoUrl = post.videoUrl ?? undefined;
 
+      const followers = post.ownerFollowersCount ?? post.followersCount ?? post.owner?.followersCount;
       console.log(`📊 [Apify] Instagram - type: ${post.type ?? "unknown"}, isVideo: ${post.isVideo ?? false}, hasVideoUrl: ${!!videoUrl}, caption: ${caption.length} chars`);
 
       return {
@@ -112,7 +119,7 @@ export async function extractFromUrl(url: string): Promise<{
           source: "caption",
           platform,
           accountHandle: handle,
-          accountFollowers: post.ownerFollowersCount,
+          accountFollowers: followers,
           postUrl: url,
           rawCaption: caption,
           thumbnailUrl: post.displayUrl ?? undefined,
@@ -136,10 +143,18 @@ export async function extractFromUrl(url: string): Promise<{
       const post = results[0];
       const caption = post.text ?? "";
       const handle = post.authorMeta?.name ?? "unknown";
-      const followers = post.authorMeta?.fans;
+      const followers =
+        post.authorMeta?.fans ??
+        post.authorMeta?.fans_count ??
+        post.authorMeta?.followers ??
+        post.authorMeta?.followerCount ??
+        undefined;
       const videoUrl = post.videoUrl ?? undefined;
 
-      console.log(`📊 [Apify] TikTok - hasVideoUrl: ${!!videoUrl}, caption: ${caption.length} chars`);
+      console.log(`📊 [Apify] TikTok - hasVideoUrl: ${!!videoUrl}, caption: ${caption.length} chars, followers: ${followers ?? "N/A"}`);
+      if (followers == null) {
+        console.warn(`⚠️  [Apify] TikTok - followers not found. authorMeta keys: ${Object.keys(post.authorMeta ?? {}).join(", ")}`);
+      }
 
       const tiktokThumb =
         post.videoMeta?.coverUrl ?? post.coverUrl ?? post.covers?.[0] ?? undefined;
@@ -155,7 +170,7 @@ export async function extractFromUrl(url: string): Promise<{
           source: "caption",
           platform,
           accountHandle: handle,
-          accountFollowers: followers,
+          accountFollowers: typeof followers === "number" ? followers : undefined,
           postUrl: url,
           rawCaption: caption,
           thumbnailUrl: tiktokThumb,

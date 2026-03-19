@@ -10,13 +10,11 @@ import { getCheckCount, incrementCheckCount, isPaidUser, FREE_CHECK_LIMIT, IS_FR
 export const maxDuration = 60;
 
 function calculateCredibilityScore(params: {
-  accountFollowers?: number;
   overallVerdict: string;
   hasSources: boolean;
   allClaimsUnverified: boolean;
 }): number {
   let score = 50;
-  if ((params.accountFollowers ?? 0) > 100000) score += 20;
   if (
     params.overallVerdict === "FALSE" ||
     params.overallVerdict === "MISLEADING" ||
@@ -215,7 +213,6 @@ export async function POST(req: NextRequest) {
     })();
 
     const credibilityScore = calculateCredibilityScore({
-      accountFollowers: content.accountFollowers,
       overallVerdict,
       hasSources,
       allClaimsUnverified,
