@@ -13,16 +13,14 @@ function calculateCredibilityScore(params: {
   overallVerdict: string;
   hasSources: boolean;
   allClaimsUnverified: boolean;
+  trueClaimCount: number;
 }): number {
   let score = 50;
-  if (
-    params.overallVerdict === "FALSE" ||
-    params.overallVerdict === "MISLEADING" ||
-    params.overallVerdict === "UNVERIFIED"
-  )
-    score -= 20;
+  if (params.overallVerdict === "FALSE" || params.overallVerdict === "MISLEADING") score -= 20;
+  if (params.overallVerdict === "UNVERIFIED") score -= 10;
   if (params.hasSources && !params.allClaimsUnverified) score += 10;
   if (params.hasSources && params.allClaimsUnverified) score -= 10;
+  score += Math.min(params.trueClaimCount * 5, 15);
   return Math.max(0, Math.min(100, score));
 }
 
@@ -212,10 +210,13 @@ export async function POST(req: NextRequest) {
       return cv;
     })();
 
+    const trueClaimCount = enrichedClaims.filter((c) => c.verdict === "TRUE").length;
+
     const credibilityScore = calculateCredibilityScore({
       overallVerdict,
       hasSources,
       allClaimsUnverified,
+      trueClaimCount,
     });
 
     const result: AnalysisResult = {

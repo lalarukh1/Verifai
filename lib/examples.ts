@@ -149,7 +149,7 @@ export const EXAMPLES: Example[] = [
           ],
         },
       ],
-      credibilityScore: 40,
+      credibilityScore: 30,
       accountSummary: "@metrouk · 2,700,000 followers",
       extractedContent: {
         text: "An Iranian drone strike has hit the International Financial Centre in Dubai.\n\nAuthorities reported no injuries and said there was only minor damage to the building.\n\nBanks in the city have ordered their staff to not return to the offices, after Iran threatened to hit US and Israeli financial institutions.\n\n#dubai #usa #iran",

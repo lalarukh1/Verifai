@@ -196,6 +196,8 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
   const allClaimsUnverified =
     result.claims.length > 0 &&
     result.claims.every((c) => c.verdict === "UNVERIFIED" || c.verdict === "NO_EVIDENCE");
+  const trueClaimCount     = result.claims.filter((c) => c.verdict === "TRUE").length;
+  const trueClaimBonus     = Math.min(trueClaimCount * 5, 15);
 
   const scoreFactors = [
     {
@@ -206,8 +208,16 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
     },
     {
       label: result.overallVerdict === "FALSE" ? "False verdict" : result.overallVerdict === "MISLEADING" ? "Misleading verdict" : "Unverified verdict",
-      delta: "−20", active: hasNegativeVerdict, positive: false,
+      delta: result.overallVerdict === "UNVERIFIED" ? "−10" : "−20",
+      active: hasNegativeVerdict,
+      positive: false,
     },
+    ...(trueClaimCount > 0 ? [{
+      label: `${trueClaimCount} claim${trueClaimCount !== 1 ? "s" : ""} confirmed true`,
+      delta: `+${trueClaimBonus}`,
+      active: true,
+      positive: true,
+    }] : []),
   ];
 
   const seenUrls = new Set<string>();
