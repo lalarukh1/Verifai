@@ -208,8 +208,8 @@ export default function Home() {
                 <p className="text-xl font-semibold text-white/90 mb-2">
                   Don&apos;t spread it. <span className="gradient-text">VerifAI it.</span>
                 </p>
-                <p className="text-sm text-white/60 leading-relaxed max-w-sm mx-auto">
-                  The truth filter for social media. Fact-check Instagram Reels<br className="hidden sm:block" /> and TikToks in under 30 seconds.
+                <p className="text-sm text-white/60 leading-relaxed max-w-sm mx-auto" style={{ textWrap: "balance" }}>
+                  The truth filter for social media. Fact-check Instagram&nbsp;Reels and TikToks in under 30&nbsp;seconds.
                 </p>
                 {/* Decorative dash — offset right */}
                 <div
