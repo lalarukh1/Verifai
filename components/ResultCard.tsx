@@ -2,7 +2,6 @@
 
 import { useState, useRef } from "react";
 import { ArrowLeft } from "lucide-react";
-import { toPng } from "html-to-image";
 import { AnalysisResult, OverallVerdict } from "@/lib/types";
 import ScoreRing from "./ScoreRing";
 import ClaimCard from "./ClaimCard";
@@ -156,31 +155,49 @@ interface ResultCardProps {
 export default function ResultCard({ result, onReset, onInfoClick }: ResultCardProps) {
   const [thumbError, setThumbError]   = useState(false);
   const [downloading, setDownloading] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null); // kept for potential future use
   const checkedAt = useRef(new Date());
 
   async function handleDownload() {
-    if (!contentRef.current || downloading) return;
+    if (downloading) return;
     setDownloading(true);
     try {
-      const dataUrl = await toPng(contentRef.current, {
-        backgroundColor: "#060E1A",
-        pixelRatio: 2,
-        style: { borderRadius: "0" },
+      const res = await fetch("/api/share-card", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          overallVerdict:  result.overallVerdict,
+          verdictReason:   result.verdictReason,
+          credibilityScore: result.credibilityScore,
+          accountSummary:  result.accountSummary,
+          claims:          result.claims.map((c) => ({ text: c.text, verdict: c.verdict })),
+        }),
       });
-      // iOS Safari doesn't support the download attribute on data URLs — open in new tab so user can long-press save
+
+      if (!res.ok) throw new Error("Image generation failed");
+
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+
+      // iOS Safari: open in new tab so user can long-press save
       const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
       if (isIOS) {
-        window.open(dataUrl, "_blank");
-        return;
+        window.open(url, "_blank");
+      } else {
+        const link = document.createElement("a");
+        link.download = `verifai-${result.extractedContent.accountHandle ?? "post"}.png`;
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       }
-      const link = document.createElement("a");
-      link.download = `verifai-${result.extractedContent.accountHandle ?? "post"}.png`;
-      link.href = dataUrl;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } finally { setDownloading(false); }
+
+      setTimeout(() => URL.revokeObjectURL(url), 10_000);
+    } catch (err) {
+      console.error("Download failed:", err);
+    } finally {
+      setDownloading(false);
+    }
   }
 
   const cfg = verdictConfig[result.overallVerdict] ?? verdictConfig.UNVERIFIED;
