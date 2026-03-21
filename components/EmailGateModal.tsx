@@ -29,17 +29,25 @@ export default function EmailGateModal({ onSubmit, onSkip }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
-      style={{ backgroundColor: "rgba(6,14,26,0.85)", backdropFilter: "blur(16px)" }}
+      className="fixed inset-x-0 top-0 z-50 flex items-center justify-center px-4"
+      style={{
+        height: "100dvh",
+        backgroundColor: "rgba(6,14,26,0.85)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        overflowY: "auto",
+      }}
     >
       {/* Card */}
       <div
-        className="animate-scale-in w-full sm:max-w-[460px] rounded-t-[24px] sm:rounded-[14px] relative overflow-hidden"
+        className="animate-scale-in w-full max-w-[460px] rounded-[20px] relative overflow-hidden my-auto"
         style={{
           background: "linear-gradient(160deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)",
           border: "1px solid rgba(255,255,255,0.1)",
           backdropFilter: "blur(32px)",
+          WebkitBackdropFilter: "blur(32px)",
           boxShadow: "0 32px 80px rgba(0,0,0,0.6), 0 0 60px rgba(45,212,191,0.08)",
+          flexShrink: 0,
         }}
       >
         {/* Gradient accent top strip */}
