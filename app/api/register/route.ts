@@ -1,6 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import { redis } from "@/lib/redis";
 
+async function addToNotion(email: string, marketingOptIn: boolean) {
+  const token = process.env.NOTION_TOKEN;
+  const databaseId = process.env.NOTION_SIGNUPS_DB_ID;
+  if (!token || !databaseId) return;
+
+  await fetch("https://api.notion.com/v1/pages", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      "Notion-Version": "2022-06-28",
+    },
+    body: JSON.stringify({
+      parent: { database_id: databaseId },
+      properties: {
+        Name: { title: [{ text: { content: email } }] },
+        Email: { rich_text: [{ text: { content: email } }] },
+        Date: { date: { start: new Date().toISOString() } },
+        Source: { rich_text: [{ text: { content: marketingOptIn ? "App (marketing opt-in)" : "App" } }] },
+      },
+    }),
+  }).catch(() => {});
+}
+
 export async function POST(req: NextRequest) {
   let body: { email?: string; marketingOptIn?: boolean };
   try {
@@ -37,6 +61,7 @@ export async function POST(req: NextRequest) {
       await redis.sadd("verifai:marketing_emails", normalised);
     }
 
+    addToNotion(normalised, marketingOptIn).catch(() => {});
     console.log(`✅ [Register] New signup: ${normalised} (marketing: ${marketingOptIn})`);
     return NextResponse.json({ success: true });
   } catch (err) {
