@@ -23,11 +23,11 @@ const verdictConfig: Record<OverallVerdict, {
   },
   MISLEADING: {
     label: "Misleading",
-    color: "#FBBF24",
-    glow: "0 0 60px rgba(251,191,36,0.2)",
-    gradient: "linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.06))",
-    darkBg: "rgba(251,191,36,0.08)",
-    textMuted: "rgba(251,191,36,0.6)",
+    color: "#F97316",
+    glow: "0 0 60px rgba(249,115,22,0.2)",
+    gradient: "linear-gradient(135deg, rgba(249,115,22,0.12), rgba(234,88,12,0.06))",
+    darkBg: "rgba(249,115,22,0.08)",
+    textMuted: "rgba(249,115,22,0.6)",
   },
   FALSE: {
     label: "False",
@@ -97,11 +97,11 @@ function formatFollowers(n: number): string {
 // ── Claim verdict colours (claim-level, not overall) ─────────────────────────
 
 const claimVerdictColor: Record<string, string> = {
-  TRUE:        "#22C55E",
-  FALSE:       "#EF4444",
+  TRUE:        "#34D399",
+  FALSE:       "#F87171",
   MISLEADING:  "#F97316",
-  UNVERIFIED:  "#EF4444",
-  NO_EVIDENCE: "#EF4444",
+  UNVERIFIED:  "#94A3B8",
+  NO_EVIDENCE: "#94A3B8",
 };
 
 /** Human-readable display labels for claim verdicts in the summary card */
@@ -115,13 +115,13 @@ const claimVerdictLabel: Record<string, string> = {
 
 // ── Small verdict badge (used in the summary card) ────────────────────────────
 
-function VerdictBadgeMini({ label, color }: { label: string; color: string }) {
+function VerdictBadgeMini({ label, color, dot = true }: { label: string; color: string; dot?: boolean }) {
   return (
     <span
-      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wide"
-      style={{ background: `${color}22`, color, border: `1px solid ${color}55` }}
+      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wide ${dot ? "gap-1.5" : ""}`}
+      style={{ background: `${color}22`, color, ...(dot ? { border: `1px solid ${color}55` } : {}) }}
     >
-      <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: color }} />
+      {dot && <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: color }} />}
       {label}
     </span>
   );
@@ -384,7 +384,7 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
                         <p className="text-xs leading-relaxed mb-1.5" style={{ color: "rgba(255,255,255,0.75)" }}>
                           {clean(claim.text)}
                         </p>
-                        <VerdictBadgeMini label={claimVerdictLabel[claim.verdict] ?? claim.verdict} color={claimColor} />
+                        <VerdictBadgeMini label={claimVerdictLabel[claim.verdict] ?? claim.verdict} color={claimColor} dot={false} />
                       </div>
                     </div>
                   );

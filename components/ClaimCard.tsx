@@ -6,9 +6,9 @@ import { Claim, ClaimVerdict } from "@/lib/types";
 const verdictConfig: Record<ClaimVerdict, { label: string; color: string; darkBg: string; glow: string }> = {
   TRUE:        { label: "True",        color: "#34D399", darkBg: "rgba(52,211,153,0.1)",  glow: "rgba(52,211,153,0.2)"  },
   FALSE:       { label: "False",       color: "#F87171", darkBg: "rgba(248,113,113,0.1)", glow: "rgba(248,113,113,0.2)" },
-  MISLEADING:  { label: "Misleading",  color: "#FBBF24", darkBg: "rgba(251,191,36,0.1)",  glow: "rgba(251,191,36,0.2)"  },
+  MISLEADING:  { label: "Misleading",  color: "#F97316", darkBg: "rgba(249,115,22,0.1)",  glow: "rgba(249,115,22,0.2)"  },
   UNVERIFIED:  { label: "Unverified",  color: "#94A3B8", darkBg: "rgba(148,163,184,0.08)", glow: "rgba(148,163,184,0.1)" },
-  NO_EVIDENCE: { label: "No evidence", color: "#64748B", darkBg: "rgba(100,116,139,0.08)", glow: "rgba(100,116,139,0.1)" },
+  NO_EVIDENCE: { label: "No evidence", color: "#94A3B8", darkBg: "rgba(148,163,184,0.08)", glow: "rgba(148,163,184,0.1)" },
 };
 
 interface ClaimCardProps { claim: Claim; }
@@ -52,8 +52,8 @@ export default function ClaimCard({ claim }: ClaimCardProps) {
         {/* Top row: badge + chevron */}
         <div className="flex items-center justify-between gap-2">
           <span
-            className="text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 font-mono"
-            style={{ color: cfg.color, backgroundColor: cfg.darkBg }}
+            className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wide flex-shrink-0"
+            style={{ background: `${cfg.color}22`, color: cfg.color }}
           >
             {cfg.label}
           </span>

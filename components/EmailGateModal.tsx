@@ -6,9 +6,10 @@ const IS_FREE_MODE = process.env.NEXT_PUBLIC_MODE !== "paid";
 
 interface Props {
   onSubmit: (email: string, marketingOptIn: boolean) => void;
+  onSkip: () => void;
 }
 
-export default function EmailGateModal({ onSubmit }: Props) {
+export default function EmailGateModal({ onSubmit, onSkip }: Props) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -50,6 +51,16 @@ export default function EmailGateModal({ onSubmit }: Props) {
           }}
         />
 
+        {/* Skip button */}
+        <button
+          onClick={onSkip}
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full transition-all active:scale-95"
+          style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.4)" }}
+          aria-label="Skip"
+        >
+          ✕
+        </button>
+
         <div className="px-7 pt-8 pb-9 sm:px-9 sm:pt-10 sm:pb-11">
           {/* Logo */}
           <div className="text-center mb-7">
@@ -68,11 +79,10 @@ export default function EmailGateModal({ onSubmit }: Props) {
           {IS_FREE_MODE ? (
             <>
               <h2 className="text-xl font-bold text-center mb-2.5" style={{ color: "#F0F9FF" }}>
-                VerifAI is free to use
+                Free during early access
               </h2>
               <p className="text-sm text-center mb-8 leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
-                Just add your email to get started. We&apos;ll never spam you, we only use it to
-                track how many people are using VerifAI and to send the occasional product update.
+                Drop your email to stay in the loop as we improve VerifAI. We never spam, never share your data.
               </p>
             </>
           ) : (

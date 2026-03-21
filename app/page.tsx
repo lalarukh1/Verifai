@@ -7,6 +7,7 @@ import ResultCard from "@/components/ResultCard";
 import InfoModal from "@/components/InfoModal";
 import EmailGateModal from "@/components/EmailGateModal";
 import PaywallModal from "@/components/PaywallModal";
+import FeedbackButton from "@/components/FeedbackButton";
 import { AnalysisResult, CheckResponse } from "@/lib/types";
 import { EXAMPLES } from "@/lib/examples";
 
@@ -43,14 +44,13 @@ export default function Home() {
   }
 
   async function handleSubmit(url: string) {
-    if (!email) return;
     setError(null);
     setStage("loading");
     try {
       const res = await fetch("/api/check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url, email }),
+        body: JSON.stringify({ url, email: email ?? "" }),
       });
       const data = (await res.json()) as CheckResponse;
       if (data.paywalled && !IS_FREE_MODE) {
@@ -188,7 +188,7 @@ export default function Home() {
                   border: "1px solid rgba(45,212,191,0.2)",
                 }}>
                 <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-glow inline-block" />
-                <span className="text-xs font-mono text-teal-400 tracking-wider uppercase">AI Fact-Checker</span>
+                <span className="text-xs font-mono text-teal-400 tracking-wider uppercase">Early Access Beta</span>
               </div>
 
               {/* Title */}
@@ -206,10 +206,10 @@ export default function Home() {
               {/* Subtitle — slightly asymmetric */}
               <div className="relative">
                 <p className="text-xl font-semibold text-white/90 mb-2">
-                  Fact-check anything. <span className="gradient-text">Instantly.</span>
+                  Don&apos;t spread it. <span className="gradient-text">VerifAI it.</span>
                 </p>
                 <p className="text-sm text-white/60 leading-relaxed max-w-sm mx-auto">
-                  Verify news and information in Instagram Reels<br className="hidden sm:block" /> and TikToks before you share.
+                  The truth filter for social media. Fact-check Instagram Reels<br className="hidden sm:block" /> and TikToks in under 30 seconds.
                 </p>
                 {/* Decorative dash — offset right */}
                 <div
@@ -248,8 +248,9 @@ export default function Home() {
 
       {/* ── Overlays ──────────────────────────────────── */}
       {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
-      {mounted && !email && <EmailGateModal onSubmit={handleEmailSubmit} />}
+      {mounted && !email && <EmailGateModal onSubmit={handleEmailSubmit} onSkip={() => setEmail("guest")} />}
       {!IS_FREE_MODE && showPaywall && email && <PaywallModal email={email} />}
+      <FeedbackButton />
     </main>
   );
 }

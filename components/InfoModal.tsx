@@ -10,28 +10,28 @@ const sections: Section[] = [
   {
     icon: "🤖",
     title: "The AI",
-    body: "Analysis is powered by Claude (claude-sonnet-4-6) by Anthropic, one of the most capable AI models available. Claude reads the post caption and any spoken audio, identifies specific factual claims, and evaluates each one based on what credible evidence says.",
+    body: "VerifAI uses a state-of-the-art large language model to read the post, pull out specific factual claims, and assess each one against real evidence. It reasons about what's supported, what's contested, and what simply can't be verified.",
   },
   {
     icon: "📥",
-    title: "Content extraction",
-    body: "VerifAI uses Apify to extract captions and metadata from Instagram and TikTok posts. For video posts, Deepgram transcribes the audio so that claims spoken in the video are also checked.",
+    title: "How posts are read",
+    body: "When you paste a link, we extract the caption and any on-screen text from the post. For videos, we also transcribe the spoken audio, so claims said out loud are checked too, not just what's written.",
   },
   {
     icon: "🔍",
     title: "Where sources come from",
-    body: "For each claim, VerifAI searches Google News, trusted authorities (WHO, CDC, Reuters, AP, BBC), and a broad web fallback. Up to 5 real sources are returned per claim with links so you can read them yourself.",
+    body: "For each claim, we search across news outlets, public health bodies, and the broader web to find relevant evidence. Up to 5 real sources are returned per claim with links so you can read them yourself.",
   },
   {
     icon: "📊",
     title: "How the credibility score works",
-    body: "The score starts at 50. It goes up by 20 if the account has over 100K followers, and by 10 if claims have verifiable sources. It goes down by 20 if the verdict is False or Misleading.",
+    body: "The score starts at 50. It rises when claims are backed by verifiable sources or confirmed true. It falls when the verdict is False or Misleading, or when no supporting evidence can be found.",
   },
   IS_FREE_MODE
     ? {
         icon: "✨",
-        title: "Free to use",
-        body: "VerifAI is currently free to use. Just add your email to get started. We only use it to track how many people are using the app and send occasional updates. We never spam or share your data.",
+        title: "Free during beta",
+        body: "VerifAI is free to use during early access. No credit card, no catch. We only ask for your email so we can share updates as we improve the product. We never spam or share your data.",
       }
     : {
         icon: "✨",

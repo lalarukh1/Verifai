@@ -54,8 +54,8 @@ export async function POST(req: NextRequest) {
 
   const { url, email } = body;
 
-  // ── EMAIL GATING ─────────────────────────────────────────────
-  if (!email || typeof email !== "string" || !email.includes("@")) {
+  // ── EMAIL GATING (skipped in free mode) ─────────────────────
+  if (!IS_FREE_MODE && (!email || typeof email !== "string" || !email.includes("@"))) {
     return NextResponse.json(
       { success: false, error: "A valid email address is required." },
       { status: 400 }
