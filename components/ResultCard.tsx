@@ -166,11 +166,14 @@ export default function ResultCard({ result, onReset, onInfoClick }: ResultCardP
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          overallVerdict:  result.overallVerdict,
-          verdictReason:   result.verdictReason,
-          credibilityScore: result.credibilityScore,
-          accountSummary:  result.accountSummary,
-          claims:          result.claims.map((c) => ({ text: c.text, verdict: c.verdict })),
+          overallVerdict:    result.overallVerdict,
+          verdictReason:     result.verdictReason,
+          credibilityScore:  result.credibilityScore,
+          accountHandle:     result.extractedContent.accountHandle ?? null,
+          accountFollowers:  result.extractedContent.accountFollowers ?? null,
+          platform:          result.extractedContent.platform,
+          claims:            result.claims.map((c) => ({ text: c.text, verdict: c.verdict })),
+          sourceCount:       result.claims.reduce((acc, c) => acc + (c.sources?.length ?? 0), 0),
         }),
       });
 
