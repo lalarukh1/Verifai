@@ -6,6 +6,7 @@ import { extractClaimsAndGenre, assignVerdicts } from "@/lib/claude";
 import { searchClaimsForEvidence } from "@/lib/search";
 import { AnalysisResult, Claim, CheckResponse } from "@/lib/types";
 import { getCheckCount, incrementCheckCount, isPaidUser, FREE_CHECK_LIMIT, IS_FREE_MODE, getCachedResult, setCachedResult } from "@/lib/redis";
+import { logCheckedLink } from "@/lib/notion-log";
 
 export const maxDuration = 60;
 
@@ -108,6 +109,7 @@ export async function POST(req: NextRequest) {
     console.log(`✅ [Cache] Hit for: ${url.trim().slice(0, 80)}`);
     const newCount = IS_FREE_MODE || isAdmin || paid ? count : await incrementCheckCount(email ?? "");
     const checksRemaining = IS_FREE_MODE || isAdmin || paid ? null : Math.max(0, FREE_CHECK_LIMIT - newCount);
+    logCheckedLink(url.trim(), cached, true).catch(() => {});
     const response: CheckResponse = {
       success: true,
       result: cached,
@@ -251,6 +253,7 @@ export async function POST(req: NextRequest) {
 
     // Cache result so repeat checks of the same URL are instant and consistent
     await setCachedResult(url.trim(), result);
+    logCheckedLink(url.trim(), result, false).catch(() => {});
 
     // Increment the check counter after a successful analysis (skip in free mode, for admins, or paid users)
     const newCount = IS_FREE_MODE || isAdmin || paid ? count : await incrementCheckCount(email ?? "");
