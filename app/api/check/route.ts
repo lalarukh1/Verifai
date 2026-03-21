@@ -67,11 +67,11 @@ export async function POST(req: NextRequest) {
     .split(",")
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean);
-  const isAdmin = adminEmails.includes(email.toLowerCase().trim());
+  const isAdmin = adminEmails.includes((email ?? "").toLowerCase().trim());
 
   const [count, paid] = isAdmin || IS_FREE_MODE
     ? [0, true]
-    : await Promise.all([getCheckCount(email), isPaidUser(email)]);
+    : await Promise.all([getCheckCount(email ?? ""), isPaidUser(email ?? "")]);
 
   if (!IS_FREE_MODE && !isAdmin && count >= FREE_CHECK_LIMIT && !paid) {
     const response: CheckResponse = {
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
   const cached = await getCachedResult(url.trim());
   if (cached) {
     console.log(`✅ [Cache] Hit for: ${url.trim().slice(0, 80)}`);
-    const newCount = IS_FREE_MODE || isAdmin || paid ? count : await incrementCheckCount(email);
+    const newCount = IS_FREE_MODE || isAdmin || paid ? count : await incrementCheckCount(email ?? "");
     const checksRemaining = IS_FREE_MODE || isAdmin || paid ? null : Math.max(0, FREE_CHECK_LIMIT - newCount);
     const response: CheckResponse = {
       success: true,
@@ -253,7 +253,7 @@ export async function POST(req: NextRequest) {
     await setCachedResult(url.trim(), result);
 
     // Increment the check counter after a successful analysis (skip in free mode, for admins, or paid users)
-    const newCount = IS_FREE_MODE || isAdmin || paid ? count : await incrementCheckCount(email);
+    const newCount = IS_FREE_MODE || isAdmin || paid ? count : await incrementCheckCount(email ?? "");
     const checksRemaining = IS_FREE_MODE || isAdmin || paid ? null : Math.max(0, FREE_CHECK_LIMIT - newCount);
 
     const response: CheckResponse = {
