@@ -1,4 +1,5 @@
 import { Redis } from "@upstash/redis";
+import { createHash } from "crypto";
 
 export const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL!,
@@ -38,7 +39,8 @@ export async function markAsPaid(email: string): Promise<void> {
 const CACHE_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days
 
 function cacheKey(url: string) {
-  return `verifai:result:${url.toLowerCase().trim()}`;
+  const hash = createHash("sha256").update(url.toLowerCase().trim()).digest("hex");
+  return `verifai:result:${hash}`;
 }
 
 export async function getCachedResult(url: string) {

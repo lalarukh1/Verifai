@@ -33,8 +33,11 @@ export async function checkRateLimit(
     if (!success) console.warn(`🚫 [Upstash] Rate limit hit for IP: ${ip}`);
     return { allowed: success, remaining };
   } catch (err) {
-    console.error("❌ [Upstash] Rate limit check failed:", err);
-    // Fail open - allow request if Redis is down
+    // Failing open (allowing the request) because Redis is unreachable.
+    // To get alerted when this happens:
+    //   - Vercel: Dashboard > Project > Settings > Log Drains, or set up an alert on error logs
+    //   - Upstash: Dashboard > Database > Alerts
+    console.error("CRITICAL [Upstash] Rate limit unavailable - failing open. Set up Vercel/Upstash alerts to catch this.", err);
     return { allowed: true, remaining: 0 };
   }
 }

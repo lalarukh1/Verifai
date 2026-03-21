@@ -10,25 +10,21 @@ export async function POST(req: NextRequest) {
   const sig = req.headers.get("stripe-signature") ?? "";
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET ?? "";
 
+  if (!webhookSecret) {
+    console.error("CRITICAL: STRIPE_WEBHOOK_SECRET is not set - rejecting webhook");
+    return NextResponse.json({ error: "Webhook not configured" }, { status: 500 });
+  }
+
   let event: Stripe.Event;
 
-  // If webhook secret is still the placeholder, skip verification (local dev only)
-  if (webhookSecret === "placeholder" || webhookSecret === "") {
-    try {
-      event = JSON.parse(body) as Stripe.Event;
-    } catch {
-      return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-    }
-  } else {
-    try {
-      event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
-    } catch (err) {
-      console.error("Stripe webhook signature verification failed:", err);
-      return NextResponse.json(
-        { error: "Webhook signature verification failed" },
-        { status: 400 }
-      );
-    }
+  try {
+    event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
+  } catch (err) {
+    console.error("Stripe webhook signature verification failed:", err);
+    return NextResponse.json(
+      { error: "Webhook signature verification failed" },
+      { status: 400 }
+    );
   }
 
   // Handle successful checkout → mark the email as a paid user in Redis
